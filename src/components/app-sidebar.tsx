@@ -1,22 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import {
-  Command,
-  Settings,
-  SquareTerminal,
-} from "lucide-react"
+import * as React from "react";
+import { Command, Settings, SquareTerminal } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // This is sample data.
 const data = {
@@ -42,18 +38,18 @@ const data = {
       items: [
         {
           title: "Agent",
-          url: "#",
-          requiredProfile: "ADMIN"
+          url: "/admin/dashboard/agent",
+          requiredProfile: "ADMIN",
         },
         {
           title: "Demande",
-          url: "#",
-          requiredProfile: "ADMIN;AGENT"
+          url: "/admin/dashboard/demand",
+          requiredProfile: "ADMIN;AGENT",
         },
         {
           title: "Note de service",
-          url: "#",
-          requiredProfile: "ADMIN;AGENT"
+          url: "/admin/dashboard/note",
+          requiredProfile: "ADMIN;AGENT",
         },
       ],
     },
@@ -65,18 +61,18 @@ const data = {
       items: [
         {
           title: "Actualité",
-          url: "#",
-          requiredProfile: "ADMIN"
+          url: "/admin/dashboard/news",
+          requiredProfile: "ADMIN",
         },
         {
           title: "Formation",
-          url: "#",
-          requiredProfile: "ADMIN"
-        }
+          url: "/admin/dashboard/formation",
+          requiredProfile: "ADMIN",
+        },
       ],
-    }
+    },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -92,5 +88,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
