@@ -38,17 +38,17 @@ const data = {
       items: [
         {
           title: "Agent",
-          url: "/admin/dashboard/agent",
+          url: "/admin/agent",
           requiredProfile: "ADMIN",
         },
         {
           title: "Demande",
-          url: "/admin/dashboard/demand",
+          url: "/admin/demand",
           requiredProfile: "ADMIN;AGENT",
         },
         {
           title: "Note de service",
-          url: "/admin/dashboard/note",
+          url: "/admin/note",
           requiredProfile: "ADMIN;AGENT",
         },
       ],
@@ -61,12 +61,17 @@ const data = {
       items: [
         {
           title: "Actualité",
-          url: "/admin/dashboard/news",
+          url: "/admin/site/news",
           requiredProfile: "ADMIN",
         },
         {
           title: "Formation",
-          url: "/admin/dashboard/formation",
+          url: "/admin/site/formation",
+          requiredProfile: "ADMIN",
+        },
+        {
+          title: "Service",
+          url: "/admin/site/service",
           requiredProfile: "ADMIN",
         },
       ],
