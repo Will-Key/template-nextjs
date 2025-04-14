@@ -20,7 +20,9 @@ const formSchema = z.object({
   label: z.string().min(3, {
     message: "Le service doit être au moins 3 caractères",
   }),
-  description: z.string(),
+  description: z.string().min(100, {
+    message: "La description doit être au moins 100 caractères",
+  }),
 });
 
 export function ServiceForm() {
@@ -44,13 +46,10 @@ export function ServiceForm() {
           name="label"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Libellé</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Entrer le libellé" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -60,18 +59,20 @@ export function ServiceForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="shadcn" {...field} />
+                <Textarea placeholder="Entrer la description" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <div className="flex justify-end">
+          <Button type="submit">Créer</Button>
+          <Button type="button" className="ml-0.5">
+            Annuler
+          </Button>
+        </div>
       </form>
     </Form>
   );

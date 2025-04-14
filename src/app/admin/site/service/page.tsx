@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ServiceForm } from "./ServiceForm";
 
 export default function Page() {
   const [open, setOpen] = useState(false);
@@ -21,29 +22,13 @@ export default function Page() {
         <h1 className="text-2xl font-semibold">Services</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setOpen(true)}>Add Service</Button>
+            <Button onClick={() => setOpen(true)}>Créer un service</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Create a new service</DialogTitle>
+              <DialogTitle>Créer / Modifier un service</DialogTitle>
             </DialogHeader>
-
-            {/* Step 2: We'll add the form here */}
-            <form className="space-y-4">
-              <input
-                type="text"
-                placeholder="Service name"
-                className="w-full px-3 py-2 border rounded"
-              />
-              <input
-                type="text"
-                placeholder="Description"
-                className="w-full px-3 py-2 border rounded"
-              />
-              <Button type="submit" onClick={() => setOpen(false)}>
-                Save
-              </Button>
-            </form>
+            <ServiceForm />
           </DialogContent>
         </Dialog>
       </div>
