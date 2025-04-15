@@ -13,7 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Service } from "@prisma/client";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -25,7 +28,15 @@ const formSchema = z.object({
   }),
 });
 
-export function ServiceForm() {
+export function ServiceForm({
+  service,
+  onClose,
+  onSuccess,
+}: {
+  service?: Service;
+  onClose?: () => void;
+  onSuccess?: () => void;
+}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,8 +45,35 @@ export function ServiceForm() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  // Remplir les champs si mode édition
+  useEffect(() => {
+    if (service) {
+      form.reset({
+        label: service.label,
+        description: service.description,
+      });
+    }
+  }, [service, form]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const res = await fetch(
+      service?.id ? `/api/services/${service.id}` : `/api/services`,
+      {
+        method: service?.id ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }
+    );
+
+    if (!res.ok) throw new Error("Erreur lors de la soumission");
+
+    const data = await res.json();
+    toast.success(service?.id ? "Service mis à jour" : "Service créé");
+
+    onClose?.();
+    onSuccess?.();
   };
 
   return (

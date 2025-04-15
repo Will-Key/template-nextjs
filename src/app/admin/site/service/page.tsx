@@ -11,9 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ServiceForm } from "./ServiceForm";
+import { toast } from "sonner";
 
 export default function Page() {
   const [open, setOpen] = useState(false);
+
+  const handleSuccess = () => {
+    toast.success("Service créé avec succès !");
+    setOpen(false); // <-- ferme la modale
+  };
 
   return (
     <div>
@@ -26,9 +32,12 @@ export default function Page() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Créer / Modifier un service</DialogTitle>
+              <DialogTitle>Créer ou Modifier un service</DialogTitle>
             </DialogHeader>
-            <ServiceForm />
+            <ServiceForm
+              onClose={() => setOpen(false)}
+              onSuccess={handleSuccess}
+            />
           </DialogContent>
         </Dialog>
       </div>
