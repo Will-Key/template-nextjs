@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppHeader from "@/components/app-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,15 +11,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ServiceForm } from "./ServiceForm";
-import { toast } from "sonner";
+import { Service } from "./model";
+import ServiceList from "./ServiceList";
 
 export default function Page() {
   const [open, setOpen] = useState(false);
+  const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+
+  const fetchServices = async () => {
+    const res = await fetch("/api/services");
+    const data = await res.json();
+    setServices(data);
+  };
+
+  const handleOpenForm = (service: Service | null = null) => {
+    setServiceToEdit(service);
+    setOpen(true);
+  };
 
   const handleSuccess = () => {
-    toast.success("Service créé avec succès !");
-    setOpen(false); // <-- ferme la modale
+    setOpen(false);
+    fetchServices();
   };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
   return (
     <div>
@@ -28,19 +46,29 @@ export default function Page() {
         <h1 className="text-2xl font-semibold">Services</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setOpen(true)}>Créer un service</Button>
+            <Button onClick={() => handleOpenForm(null)}>
+              Créer un service
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Créer ou Modifier un service</DialogTitle>
+              <DialogTitle>
+                {serviceToEdit ? "Modifier" : "Créer"} un service
+              </DialogTitle>
             </DialogHeader>
             <ServiceForm
+              service={serviceToEdit}
               onClose={() => setOpen(false)}
               onSuccess={handleSuccess}
             />
           </DialogContent>
         </Dialog>
       </div>
+      <ServiceList
+        services={services}
+        onEdit={(service) => handleOpenForm(service)}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

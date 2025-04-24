@@ -14,10 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Service } from "@prisma/client";
+import { useState } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ServiceFormProps } from "./model";
 
 const formSchema = z.object({
   label: z.string().min(3, {
@@ -26,26 +28,34 @@ const formSchema = z.object({
   description: z.string().min(100, {
     message: "La description doit être au moins 100 caractères",
   }),
+  image: z.any().optional(),
 });
 
-export function ServiceForm({
-  service,
-  onClose,
-  onSuccess,
-}: {
-  service?: Service;
-  onClose?: () => void;
-  onSuccess?: () => void;
-}) {
+/**
+ * 
+ image: z
+    .any()
+    .refine((file) => file?.length === 1, {
+      message: "Une image est requise",
+    })
+    .refine((file) => file?.[0]?.type?.startsWith("image/"), {
+      message: "Le fichier doit être une image",
+    }),
+ */
+
+export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       label: "",
       description: "",
+      image: undefined,
     },
   });
 
-  // Remplir les champs si mode édition
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (service) {
       form.reset({
@@ -56,24 +66,37 @@ export function ServiceForm({
   }, [service, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const res = await fetch(
-      service?.id ? `/api/services/${service.id}` : `/api/services`,
-      {
-        method: service?.id ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      }
-    );
+    setLoading(true);
+    const formData = new FormData();
 
-    if (!res.ok) throw new Error("Erreur lors de la soumission");
+    formData.append("label", values.label);
+    formData.append("description", values.description);
+    if (file) formData.append("image", file);
 
-    const data = await res.json();
-    toast.success(service?.id ? "Service mis à jour" : "Service créé");
+    const endpoint = service ? `/api/services/${service.id}` : "/api/services";
 
-    onClose?.();
-    onSuccess?.();
+    const method = service ? "PUT" : "POST";
+
+    const res = await fetch(endpoint, {
+      method,
+      body: service ? JSON.stringify(values) : formData,
+      headers: service
+        ? {
+            "Content-Type": "application/json",
+          }
+        : undefined,
+    });
+
+    if (res.ok) {
+      toast.success(`Service ${service ? "modifié" : "créé"} avec succès`);
+      form.reset();
+      setFile(null);
+      onSuccess?.();
+    } else {
+      console.log(res);
+      toast.error("Une erreur est survenue");
+    }
+    setLoading(false);
   };
 
   return (
@@ -105,9 +128,32 @@ export function ServiceForm({
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button type="submit">Créer</Button>
-          <Button type="button" className="ml-0.5">
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image illustrative</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end gap-2">
+          <Button type="submit" disabled={loading}>
+            {loading ? "Chargement..." : "Créer"}
+          </Button>
+          <Button
+            type="button"
+            variant={"outline"}
+            onClick={onClose}
+            disabled={loading}
+          >
             Annuler
           </Button>
         </div>

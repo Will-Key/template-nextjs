@@ -17,6 +17,7 @@ model Service {
   id          Int      @id @default(autoincrement())
   label       String
   description String
+  image       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
