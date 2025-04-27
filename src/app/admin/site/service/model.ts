@@ -2,6 +2,7 @@ export interface Service {
   id: number;
   label: string;
   description: string;
+  content: string[]
   image?: string;
 }
 

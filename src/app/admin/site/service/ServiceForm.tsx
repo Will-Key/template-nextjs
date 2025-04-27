@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -13,35 +12,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Service } from "@prisma/client";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ServiceFormProps } from "./model";
+import { FormChipsInput } from "@/components/ui/form-chips-input";
 
 const formSchema = z.object({
   label: z.string().min(3, {
     message: "Le service doit être au moins 3 caractères",
   }),
-  description: z.string().min(100, {
-    message: "La description doit être au moins 100 caractères",
+  description: z.string().min(10, {
+    message: "La description doit être au moins 10 caractères",
   }),
+  content: z.array(z.string()).min(1, "At least one content item is required"),
   image: z.any().optional(),
 });
-
-/**
- * 
- image: z
-    .any()
-    .refine((file) => file?.length === 1, {
-      message: "Une image est requise",
-    })
-    .refine((file) => file?.[0]?.type?.startsWith("image/"), {
-      message: "Le fichier doit être une image",
-    }),
- */
 
 export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,6 +37,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
     defaultValues: {
       label: "",
       description: "",
+      content: [],
       image: undefined,
     },
   });
@@ -61,42 +50,47 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
       form.reset({
         label: service.label,
         description: service.description,
+        content: service.content,
+        image: service.image,
       });
     }
   }, [service, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append("label", values.label);
-    formData.append("description", values.description);
-    if (file) formData.append("image", file);
+      formData.append("label", values.label);
+      formData.append("description", values.description);
+      formData.append("content", values.content.join(","));
+      if (file) formData.append("image", file);
 
-    const endpoint = service ? `/api/services/${service.id}` : "/api/services";
+      const endpoint = service
+        ? `/api/services/${service.id}`
+        : "/api/services";
+      const method = service ? "PUT" : "POST";
 
-    const method = service ? "PUT" : "POST";
+      const res = await fetch(endpoint, {
+        method,
+        body: formData,
+      });
 
-    const res = await fetch(endpoint, {
-      method,
-      body: service ? JSON.stringify(values) : formData,
-      headers: service
-        ? {
-            "Content-Type": "application/json",
-          }
-        : undefined,
-    });
-
-    if (res.ok) {
-      toast.success(`Service ${service ? "modifié" : "créé"} avec succès`);
-      form.reset();
-      setFile(null);
-      onSuccess?.();
-    } else {
-      console.log(res);
-      toast.error("Une erreur est survenue");
+      if (res.ok) {
+        toast.success(`Service ${service ? "modifié" : "créé"} avec succès`);
+        form.reset();
+        setFile(null);
+        onSuccess?.();
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || "Une erreur est survenue");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Une erreur est survenue lors de la soumission");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -128,6 +122,11 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
             </FormItem>
           )}
         />
+        <FormChipsInput
+          name="content"
+          label="Contenu du service"
+          placeholder="Add service content items..."
+        />
         <FormField
           control={form.control}
           name="image"
@@ -146,7 +145,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
         />
         <div className="flex justify-end gap-2">
           <Button type="submit" disabled={loading}>
-            {loading ? "Chargement..." : "Créer"}
+            {loading ? "Chargement..." : service?.id ? "Modifier" : "Créer"}
           </Button>
           <Button
             type="button"

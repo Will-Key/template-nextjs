@@ -21,10 +21,10 @@ export async function POST(req: Request) {
     if (contentType.includes("application/json")) {
       // 🔹 Mode JSON simple (sans image)
       const body = await req.json();
-      const { label, description } = body;
+      const { label, description, content } = body;
 
       const service = await prisma.service.create({
-        data: { label, description },
+        data: { label, description, content },
       });
 
       return NextResponse.json(service);
@@ -36,10 +36,9 @@ export async function POST(req: Request) {
       console.log('formData', formData)
       const label = formData.get("label")?.toString() || "";
       const description = formData.get("description")?.toString() || "";
+      const content = formData.get("content")?.toString().split(',') || [];
       const file = formData.get("image") as File | null;
-      console.log(label)
-      console.log(description)
-      console.log(file)
+
       if (!label || !description || !file) {
         return NextResponse.json(
           { error: "Champs requis manquants" },
@@ -57,6 +56,7 @@ export async function POST(req: Request) {
         data: {
           label,
           description,
+          content,
           image: `/uploads/${filename}`,
         },
       });
