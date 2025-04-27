@@ -1,11 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import Image from "next/image";
 import { ServiceListProps } from "./model";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function ServiceList({
   services,
@@ -48,13 +58,33 @@ export default function ServiceList({
             <Button size="sm" variant="outline" onClick={() => onEdit(service)}>
               Modifier
             </Button>
-            <Button
+            {/* <Button
               size="sm"
               variant="destructive"
               onClick={() => handleDelete(service.id)}
             >
               Supprimer
-            </Button>
+            </Button> */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline">Supprimer</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Êtes-vous sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Voulez-vous vraiment supprimer ce service ? Cette action est
+                    irréversible.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleDelete(service.id)}>
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardFooter>
         </Card>
       ))}
