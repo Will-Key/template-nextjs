@@ -50,7 +50,7 @@ export default function Page() {
               Créer un service
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[550px]">
             <DialogHeader>
               <DialogTitle>
                 {serviceToEdit ? "Modifier" : "Créer"} un service
