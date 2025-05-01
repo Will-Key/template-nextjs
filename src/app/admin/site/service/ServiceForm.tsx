@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ServiceFormProps } from "./model";
 import { FormChipsInput } from "@/components/ui/form-chips-input";
+import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor";
 
 const formSchema = z.object({
   label: z.string().min(3, {
@@ -60,7 +61,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
     setLoading(true);
     try {
       const formData = new FormData();
-
+      console.log(values);
       formData.append("label", values.label);
       formData.append("description", values.description);
       formData.append("content", values.content.join(","));
@@ -109,7 +110,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
@@ -121,6 +122,12 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
               <FormMessage />
             </FormItem>
           )}
+        /> */}
+        <FormRichTextEditor
+          name="description"
+          label="Content"
+          description=""
+          placeholder="Ecrivez le contenu ici"
         />
         <FormChipsInput
           name="content"
