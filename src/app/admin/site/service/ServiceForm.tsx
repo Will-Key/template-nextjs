@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -28,7 +27,7 @@ const formSchema = z.object({
   description: z.string().min(10, {
     message: "La description doit être au moins 10 caractères",
   }),
-  content: z.array(z.string()).min(1, "At least one content item is required"),
+  content: z.array(z.string()).min(1, "Au moins un contenu"),
   image: z.any().optional(),
 });
 
@@ -110,19 +109,6 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
             </FormItem>
           )}
         />
-        {/* <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Entrer la description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
         <FormRichTextEditor
           name="description"
           label="Content"

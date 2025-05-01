@@ -16,6 +16,7 @@ interface FormChipsInputProps {
   label?: string;
   description?: string;
   placeholder?: string;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -24,6 +25,7 @@ export function FormChipsInput({
   label,
   description,
   placeholder,
+  disabled,
   className,
 }: FormChipsInputProps) {
   const { control } = useFormContext();
@@ -47,6 +49,7 @@ export function FormChipsInput({
           onBlur={field.onBlur}
           name={field.name}
           placeholder={placeholder}
+          disabled={disabled}
         />
       </FormControl>
       {description && <FormDescription>{description}</FormDescription>}
