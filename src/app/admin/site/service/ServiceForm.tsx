@@ -19,6 +19,7 @@ import { z } from "zod";
 import { ServiceFormProps } from "./model";
 import { FormChipsInput } from "@/components/ui/form-chips-input";
 import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   label: z.string().min(3, {
@@ -109,16 +110,32 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
             </FormItem>
           )}
         />
-        <FormRichTextEditor
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Decription</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Entrer la description"
+                  {...field}
+                ></Textarea>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <FormRichTextEditor
           name="description"
           label="Content"
           description=""
           placeholder="Ecrivez le contenu ici"
-        />
+        /> */}
         <FormChipsInput
           name="content"
           label="Contenu du service"
-          placeholder="Add service content items..."
+          placeholder="Entrer la composition de ce service..."
         />
         <FormField
           control={form.control}

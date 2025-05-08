@@ -44,15 +44,18 @@ export async function PUT(
 }
 
 export async function DELETE(
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const service = await prisma.formation.delete({
+    console.log('params', params)
+    const formation = await prisma.formation.delete({
       where: { id: Number((params.id)) },
     });
 
-    return NextResponse.json({ message: "Service supprimé", service });
+    return NextResponse.json({ message: "Formation supprimé", formation });
   } catch (error) {
+    console.log(error)
     return NextResponse.json({ error: "Erreur suppression" }, { status: 500 });
   }
 }
