@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -20,6 +19,7 @@ import { z } from "zod";
 import { ServiceFormProps } from "./model";
 import { FormChipsInput } from "@/components/ui/form-chips-input";
 import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   label: z.string().min(3, {
@@ -28,7 +28,7 @@ const formSchema = z.object({
   description: z.string().min(10, {
     message: "La description doit être au moins 10 caractères",
   }),
-  content: z.array(z.string()).min(1, "At least one content item is required"),
+  content: z.array(z.string()).min(1, "Au moins un contenu"),
   image: z.any().optional(),
 });
 
@@ -110,29 +110,32 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
             </FormItem>
           )}
         />
-        {/* <FormField
+        <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Decription</FormLabel>
               <FormControl>
-                <Textarea placeholder="Entrer la description" {...field} />
+                <Textarea
+                  placeholder="Entrer la description"
+                  {...field}
+                ></Textarea>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
-        /> */}
-        <FormRichTextEditor
+        />
+        {/* <FormRichTextEditor
           name="description"
           label="Content"
           description=""
           placeholder="Ecrivez le contenu ici"
-        />
+        /> */}
         <FormChipsInput
           name="content"
           label="Contenu du service"
-          placeholder="Add service content items..."
+          placeholder="Entrer la composition de ce service..."
         />
         <FormField
           control={form.control}
