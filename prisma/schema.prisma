@@ -47,7 +47,7 @@ model News {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   label       String
-  type        String
+  type        String   @db.VarChar(30)
   description String   @db.VarChar(150)
   content     String
   eventDate   DateTime

@@ -7,7 +7,7 @@ export interface News {
   eventDate: Date
 }
 
-export interface NewsForm {
+export interface NewsFormProps {
   news: News | null
   mode: 'new' | 'edit' | 'view'
   onClose?: () => void

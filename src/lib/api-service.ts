@@ -1,3 +1,5 @@
+import { News } from "@prisma/client"
+
 // Définir les types pour notre API
 export type Formation = {
   id: string
@@ -163,6 +165,13 @@ export class UsersService extends BaseApiService<User> {
   }
 }
 
+export class NewsService extends BaseApiService<News> {
+  constructor() {
+    super('news')
+  }
+}
+
 // Export des instances des services
 export const formationsService = new FormationsService()
 export const usersService = new UsersService()
+export const newsServices = new NewsService()
