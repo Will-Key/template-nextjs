@@ -32,6 +32,7 @@ interface RichTextEditorProps {
   placeholder?: string;
   className?: string;
   onBlur?: () => void;
+  disabled?: boolean;
 }
 
 export const RichTextEditor = ({
@@ -40,6 +41,7 @@ export const RichTextEditor = ({
   placeholder = "Write something...",
   className,
   onBlur,
+  disabled,
 }: RichTextEditorProps) => {
   const editor = useEditor({
     extensions: [
@@ -232,7 +234,7 @@ export const RichTextEditor = ({
           variant="ghost"
           size="sm"
           onClick={() => editor?.chain().focus().undo().run()}
-          disabled={!editor?.can().undo()}
+          disabled={!editor?.can().undo() || disabled}
           aria-label="Undo"
         >
           <Undo className="h-4 w-4" />
@@ -242,14 +244,14 @@ export const RichTextEditor = ({
           variant="ghost"
           size="sm"
           onClick={() => editor?.chain().focus().redo().run()}
-          disabled={!editor?.can().redo()}
+          disabled={!editor?.can().redo() || disabled}
           aria-label="Redo"
         >
           <Redo className="h-4 w-4" />
         </Button>
       </div>
 
-      <EditorContent editor={editor} className="w-full" />
+      <EditorContent editor={editor} className="w-full" disabled={disabled} />
     </div>
   );
 };

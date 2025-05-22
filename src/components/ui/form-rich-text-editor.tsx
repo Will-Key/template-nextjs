@@ -17,6 +17,7 @@ interface FormRichTextEditorProps {
   description?: string;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function FormRichTextEditor({
@@ -25,6 +26,7 @@ export function FormRichTextEditor({
   description,
   placeholder = "Write something...",
   className,
+  disabled,
 }: FormRichTextEditorProps) {
   const { control } = useFormContext();
 
@@ -46,6 +48,7 @@ export function FormRichTextEditor({
           onChange={field.onChange}
           onBlur={field.onBlur}
           placeholder={placeholder}
+          disabled
         />
       </FormControl>
       {description && <FormDescription>{description}</FormDescription>}

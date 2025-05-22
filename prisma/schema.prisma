@@ -41,3 +41,14 @@ model Formation {
   modules         String[]
   status          FormationStatus @default(published)
 }
+
+model News {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  label       String
+  type        String   @db.VarChar(30)
+  description String   @db.VarChar(150)
+  content     String
+  eventDate   DateTime
+}
