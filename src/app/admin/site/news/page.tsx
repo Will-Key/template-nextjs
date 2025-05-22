@@ -1,3 +1,5 @@
+"use client";
+
 import AppHeader from "@/components/app-header";
 import { News } from "./models";
 import { useEffect, useState } from "react";
@@ -111,10 +113,10 @@ export default function Page() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenForm(null, "new")}>
-              Créer une News
+              Créer une actualité
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="sm:max-w-[660px] max-h-[660px] overflow-auto">
             <DialogHeader>
               <DialogTitle>
                 {formMode === "edit"
