@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { z } from "zod";
-import { NewsFormProps } from "./models";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { z } from "zod"
+import { NewsFormProps } from "./models"
+import { SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
 import {
   Form,
   FormControl,
@@ -12,14 +12,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Calendar } from "lucide-react";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { DatePicker } from "@/components/ui/date-picker"
+import { Calendar } from "lucide-react"
 
 const newsSchema = z.object({
   label: z.string().min(3, {
@@ -30,7 +30,7 @@ const newsSchema = z.object({
     .min(3, {
       message: "Le type doit être au moins 3 caractères",
     })
-    .max(10, {
+    .max(30, {
       message: "Le type ne peut pas excéder 30 caractères",
     }),
   eventDate: z.coerce.date(),
@@ -45,9 +45,9 @@ const newsSchema = z.object({
   content: z.string().min(100, {
     message: "Le contenu doit être au moins 100 caractères",
   }),
-});
+})
 
-type NewsFormValues = z.infer<typeof newsSchema>;
+type NewsFormValues = z.infer<typeof newsSchema>
 
 export default function NewsForm({
   news,
@@ -64,8 +64,8 @@ export default function NewsForm({
       description: "",
       content: "",
     },
-  });
-  const [loading, setLoading] = useState<boolean>(false);
+  })
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     if (news) {
@@ -75,40 +75,40 @@ export default function NewsForm({
         eventDate: news.eventDate,
         description: news.description,
         content: news.content,
-      });
+      })
     }
-  }, [news, form]);
+  }, [news, form])
 
   const onSubmit: SubmitHandler<NewsFormValues> = async (
     values: NewsFormValues
   ) => {
-    setLoading(true);
+    setLoading(true)
 
     try {
-      const endpoint = news ? `/api/news/${news.id}` : "/api/news";
+      const endpoint = news ? `/api/news/${news.id}` : "/api/news"
 
-      const method = news ? "PUT" : "POST";
+      const method = news ? "PUT" : "POST"
 
       const res = await fetch(endpoint, {
         method,
         body: JSON.stringify(values),
-      });
+      })
 
       if (res.ok) {
-        toast.success(`Actualité ${news ? "modifié" : "créé"} avec succès`);
-        form.reset();
-        onSuccess?.();
+        toast.success(`Actualité ${news ? "modifié" : "créé"} avec succès`)
+        form.reset()
+        onSuccess?.()
       } else {
-        const errorData = await res.json().catch(() => ({}));
-        toast.error(errorData.error || "Une erreur est survenue");
+        const errorData = await res.json().catch(() => ({}))
+        toast.error(errorData.error || "Une erreur est survenue")
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Une erreur est survenue lors de la soumission");
+      console.error("Error submitting form:", error)
+      toast.error("Une erreur est survenue lors de la soumission")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Form {...form}>
@@ -207,5 +207,5 @@ export default function NewsForm({
         </div>
       </form>
     </Form>
-  );
+  )
 }
