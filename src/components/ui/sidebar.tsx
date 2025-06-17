@@ -4,6 +4,8 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -51,6 +53,25 @@ function useSidebar() {
   }
 
   return context
+}
+
+// Hook personnalisé pour vérifier si un lien est actif
+function useIsActive(
+  href: string | undefined,
+  exact: boolean = false
+): boolean {
+  const pathname = usePathname()
+
+  if (exact) {
+    return pathname === href
+  }
+
+  // Pour les routes de dashboard, on vérifie si le pathname commence par le href
+  if (href?.startsWith("/dashboard") || href?.startsWith("/admin")) {
+    return pathname.startsWith(href)
+  }
+
+  return pathname === href
 }
 
 function SidebarProvider({
@@ -545,6 +566,31 @@ function SidebarMenuButton({
   )
 }
 
+// Nouveau composant SidebarNavButton pour la navigation
+function SidebarNavButton({
+  href,
+  exact = false,
+  children,
+  className,
+  ...props
+}: React.ComponentProps<typeof SidebarMenuButton> & {
+  href: string | undefined
+  exact?: boolean
+}) {
+  const isActive = useIsActive(href, exact)
+
+  return (
+    <SidebarMenuButton
+      asChild
+      isActive={isActive}
+      className={className}
+      {...props}
+    >
+      <Link href={href ?? ""}>{children}</Link>
+    </SidebarMenuButton>
+  )
+}
+
 function SidebarMenuAction({
   className,
   asChild = false,
@@ -698,6 +744,33 @@ function SidebarMenuSubButton({
   )
 }
 
+// Nouveau composant SidebarNavSubButton pour la navigation des sous-menus
+function SidebarNavSubButton({
+  href,
+  exact = false,
+  children,
+  className,
+  size = "md",
+  ...props
+}: React.ComponentProps<typeof SidebarMenuSubButton> & {
+  href: string
+  exact?: boolean
+}) {
+  const isActive = useIsActive(href, exact)
+
+  return (
+    <SidebarMenuSubButton
+      asChild
+      isActive={isActive}
+      size={size}
+      className={className}
+      {...props}
+    >
+      <Link href={href}>{children}</Link>
+    </SidebarMenuSubButton>
+  )
+}
+
 export {
   Sidebar,
   SidebarContent,
@@ -718,9 +791,12 @@ export {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarNavButton,
+  SidebarNavSubButton,
   SidebarProvider,
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
+  useIsActive,
 }
