@@ -1,43 +1,55 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import AppHeader from "@/components/app-header";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react"
+import AppHeader from "@/components/app-header"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { ServiceForm } from "./ServiceForm";
-import { Service } from "./model";
-import ServiceList from "./ServiceList";
+} from "@/components/ui/dialog"
+import { ServiceForm } from "./ServiceForm"
+import { Service } from "./model"
+import ServiceList from "./ServiceList"
 
 export default function Page() {
-  const [open, setOpen] = useState(false);
-  const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null)
+  const [services, setServices] = useState<Service[]>([])
 
   const fetchServices = async () => {
-    const res = await fetch("/api/services");
-    const data = await res.json();
-    setServices(data);
-  };
+    try {
+      setLoading(true)
+      const res = await fetch("/api/services")
+      const data = await res.json()
+      setServices(data)
+    } catch (err) {
+      console.error("Error fetching data:", err)
+      setError(
+        err instanceof Error ? err : new Error("Une erreur est survenue")
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleOpenForm = (service: Service | null = null) => {
-    setServiceToEdit(service);
-    setOpen(true);
-  };
+    setServiceToEdit(service)
+    setOpen(true)
+  }
 
   const handleSuccess = () => {
-    setOpen(false);
-    fetchServices();
-  };
+    setOpen(false)
+    fetchServices()
+  }
 
   useEffect(() => {
-    fetchServices();
-  }, []);
+    fetchServices()
+  }, [])
 
   return (
     <div>
@@ -68,7 +80,10 @@ export default function Page() {
         services={services}
         onEdit={(service) => handleOpenForm(service)}
         onSuccess={handleSuccess}
+        loading={loading}
+        error={error}
+        loadData={fetchServices}
       />
     </div>
-  );
+  )
 }

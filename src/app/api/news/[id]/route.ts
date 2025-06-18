@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { withAuth } from "@/lib/middleware"
 
 const prisma = new PrismaClient();
 
-export async function GET(
-  { params }: { params: { id: string } }
-) {
+interface NewsParams {
+  id: string
+}
+
+export const GET = withAuth<NewsParams>(async (_, { params }) => {
   try {
     const news = await prisma.news.findUnique({
       where: { id: Number(params.id) },
@@ -19,12 +22,9 @@ export async function GET(
   } catch (error) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-}
+})
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const PUT = withAuth<NewsParams>(async (req, { params }) => {
   const body = await req.json();
   const { label, type, description, content, eventDate } = body;
   const updatedFormation = await prisma.news.update({
@@ -35,14 +35,10 @@ export async function PUT(
   });
 
   return NextResponse.json(updatedFormation);
-}
+})
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const DELETE = withAuth<NewsParams>(async (_, { params }) => {
   try {
-    console.log('params', params)
     const news = await prisma.news.delete({
       where: { id: Number((params.id)) },
     });
@@ -52,4 +48,4 @@ export async function DELETE(
     console.log(error)
     return NextResponse.json({ error: "Erreur suppression" }, { status: 500 });
   }
-}
+})

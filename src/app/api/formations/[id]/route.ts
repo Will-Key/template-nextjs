@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { withAuth } from "@/lib/middleware"
 
 const prisma = new PrismaClient();
+interface FormationParams {
+  id: string
+}
 
-export async function GET(
-  { params }: { params: { id: string } }
-) {
+export const GET = withAuth<FormationParams>(async (_, { params }) => {
   try {
     const formation = await prisma.formation.findUnique({
       where: { id: Number(params.id) },
@@ -19,12 +21,9 @@ export async function GET(
   } catch (error) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-}
+})
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const PUT = withAuth<FormationParams>(async (req, { params }) => {
   const body = await req.json();
   const { label, description, days, maxParticipants, amount, modules } = body;
   const updatedFormation = await prisma.formation.update({
@@ -39,14 +38,10 @@ export async function PUT(
     },
   });
 
-  console.log("Service updated successfully:", updatedFormation.id);
   return NextResponse.json(updatedFormation);
-}
+})
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const DELETE = withAuth<FormationParams>(async (req, { params }) => {
   try {
     console.log('params', params)
     const formation = await prisma.formation.delete({
@@ -58,4 +53,4 @@ export async function DELETE(
     console.log(error)
     return NextResponse.json({ error: "Erreur suppression" }, { status: 500 });
   }
-}
+})

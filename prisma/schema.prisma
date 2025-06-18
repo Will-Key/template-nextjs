@@ -19,6 +19,31 @@ enum FormationStatus {
   archived
 }
 
+enum Role {
+  agent
+  admin
+  super_admin
+}
+
+enum UserStatus {
+  active
+  inactive
+}
+
+model User {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  name      String
+  password  String
+  role      Role        @default(agent)
+  status    UserStatus  @default(active)
+  lastLogin DateTime    @updatedAt
+  avatar    String?
+  Service   Service[]
+  Formation Formation[]
+  News      News[]
+}
+
 model Service {
   id          Int      @id @default(autoincrement())
   label       String
@@ -27,6 +52,8 @@ model Service {
   content     String[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 }
 
 model Formation {
@@ -40,6 +67,8 @@ model Formation {
   amount          Int
   modules         String[]
   status          FormationStatus @default(published)
+  createdBy       User?           @relation(fields: [createdById], references: [id])
+  createdById     String?
 }
 
 model News {
@@ -51,4 +80,6 @@ model News {
   description String   @db.VarChar(150)
   content     String
   eventDate   DateTime
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 }

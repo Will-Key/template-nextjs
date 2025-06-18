@@ -1,4 +1,4 @@
-import AppHeader from "@/components/app-header";
+import AppHeader from "@/components/app-header"
 
 export default function Page() {
   return (
@@ -13,5 +13,5 @@ export default function Page() {
         <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
       </div>
     </div>
-  );
+  )
 }

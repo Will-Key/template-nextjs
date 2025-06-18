@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { withAuth } from "@/lib/middleware"
 
 const prisma = new PrismaClient();
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface ServiceParams {
+  id: string
+}
+
+export const GET = withAuth<ServiceParams>(async (_, { params }) => {
   try {
     const service = await prisma.service.findUnique({
       where: { id: Number(params.id) },
@@ -22,57 +24,9 @@ export async function GET(
   } catch (error) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-}
+})
 
-// export async function PUT(
-//   req: NextRequest,
-//   { params }: { params: { id: string } }
-// ) {
-//   try {
-//     const contentType = req.headers.get("content-type") || "";
-
-//     if (contentType.includes("multipart/form-data")) {
-//       const formData = await req.formData();
-//       const label = formData.get("label")?.toString() || "";
-//       const description = formData.get("description")?.toString() || "";
-//       const file = formData.get("image") as File | null;
-
-//       let imagePath;
-
-//       if (file) {
-//         const bytes = await file.arrayBuffer();
-//         const buffer = Buffer.from(bytes);
-//         const filename = `${Date.now()}-${file.name}`;
-//         const filepath = path.join(process.cwd(), "public", "uploads", filename);
-//         await writeFile(filepath, buffer);
-//         imagePath = `/uploads/${filename}`;
-//       }
-
-//       const updatedService = await prisma.service.update({
-//         where: { id: Number(params.id) },
-//         data: {
-//           label,
-//           description,
-//           ...(imagePath && { image: imagePath }),
-//         },
-//       });
-
-//       return NextResponse.json(updatedService);
-//     }
-
-//     return NextResponse.json(
-//       { error: "Type de contenu non supporté" },
-//       { status: 415 }
-//     );
-//   } catch (error) {
-//     return NextResponse.json({ error: "Erreur mise à jour" }, { status: 500 });
-//   }
-// }
-
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const PUT = withAuth<ServiceParams>(async (req, { params }) => {
   try {
     const contentType = req.headers.get("content-type") || "";
     console.log("Received content type:", contentType);
@@ -106,12 +60,9 @@ export async function PUT(
           content = contentValue.map(item => item.toString());
         }
       }
-      
-      console.log("Processed content array:", content);
-      
+            
       // Handle image file
       const file = formData.get("image") as File | null;
-      console.log("File received:", file ? `${file.name} (${file.size} bytes)` : "No file");
       
       let imagePath: string | undefined = undefined;
 
@@ -122,15 +73,7 @@ export async function PUT(
         const filepath = path.join(process.cwd(), "public", "uploads", filename);
         await writeFile(filepath, buffer);
         imagePath = `/uploads/${filename}`;
-        console.log("Image saved to:", imagePath);
       }
-
-      console.log("Updating service with data:", {
-        label,
-        description,
-        content,
-        ...(imagePath && { image: imagePath })
-      });
       
       // Update the service in the database
       const updatedService = await prisma.service.update({
@@ -143,28 +86,22 @@ export async function PUT(
         },
       });
 
-      console.log("Service updated successfully:", updatedService.id);
       return NextResponse.json(updatedService);
     } catch (formError: any) {
-      console.error("Error processing form data:", formError);
       return NextResponse.json(
         { error: "Error processing form data: " + (formError?.message || "Unknown error") },
         { status: 400 }
       );
     }
   } catch (error: any) {
-    console.error('Error updating service:', error);
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour: " + (error?.message || "Unknown error") },
       { status: 500 }
     );
   }
-}
+})
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const DELETE = withAuth<ServiceParams>(async (_, { params }) => {
   try {
     const service = await prisma.service.delete({
       where: { id: Number((params.id)) },
@@ -174,4 +111,4 @@ export async function DELETE(
   } catch (error) {
     return NextResponse.json({ error: "Erreur suppression" }, { status: 500 });
   }
-}
+})

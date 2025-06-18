@@ -14,6 +14,9 @@ export interface ServiceFormProps {
 
 export interface ServiceListProps {
   services: Service[]
+  loading: boolean
+  error: Error | null
   onEdit: (service: Service) => void
   onSuccess?: () => void
+  loadData: () => void
 }

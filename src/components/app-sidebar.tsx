@@ -26,13 +26,14 @@ import {
   SidebarNavButton,
   SidebarNavSubButton,
   SidebarRail,
-  useIsActive,
 } from "@/components/ui/sidebar"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { usePathname } from "next/navigation"
+import { useAuth } from "@/lib/auth/AuthContext"
 
 // This is sample data.
 const data = {
@@ -53,28 +54,28 @@ const data = {
       title: "Dashboard",
       url: "/admin/dashboard",
       icon: LayoutDashboard,
-      requiredProfile: "ADMIN;AGENT;USER",
+      requiredProfile: "ADMIN;AGENT;super_admin",
     },
     {
       title: "Administration",
       url: "#",
       icon: Settings,
-      requiredProfile: "ADMIN;AGENT",
+      requiredProfile: "ADMIN;AGENT;super_admin",
       items: [
         {
           title: "Agent",
           url: "/admin/agent",
-          requiredProfile: "ADMIN",
+          requiredProfile: "ADMIN;super_admin",
         },
         {
           title: "Demande",
           url: "/admin/demand",
-          requiredProfile: "ADMIN;AGENT",
+          requiredProfile: "ADMIN;AGENT;super_admin",
         },
         {
           title: "Note de service",
           url: "/admin/note",
-          requiredProfile: "ADMIN;AGENT",
+          requiredProfile: "ADMIN;AGENT;super_admin",
         },
       ],
     },
@@ -82,22 +83,22 @@ const data = {
       title: "Site",
       url: "#",
       icon: SquareTerminal,
-      requiredProfile: "ADMIN",
+      requiredProfile: "admin;super_admin",
       items: [
         {
           title: "Actualité",
           url: "/admin/site/news",
-          requiredProfile: "ADMIN",
+          requiredProfile: "admin;super_admin",
         },
         {
           title: "Formation",
           url: "/admin/site/formation",
-          requiredProfile: "ADMIN",
+          requiredProfile: "admin;super_admin",
         },
         {
           title: "Service",
           url: "/admin/site/service",
-          requiredProfile: "ADMIN",
+          requiredProfile: "admin;super_admin",
         },
       ],
     },
@@ -105,20 +106,132 @@ const data = {
 }
 
 // Fonction utilitaire pour vérifier les permissions
-function hasPermission(userProfile: string, requiredProfile: string): boolean {
-  const userProfiles = userProfile.split(";")
-  const requiredProfiles = requiredProfile.split(";")
-  return requiredProfiles.some((profile) => userProfiles.includes(profile))
+function hasPermission(
+  userProfile: string | undefined,
+  requiredProfile: string
+): boolean {
+  const userProfiles = userProfile?.toLowerCase()?.split(";")
+  const requiredProfiles = requiredProfile?.toLowerCase().split(";")
+  return requiredProfiles.some((profile) =>
+    userProfiles?.includes(profile?.toLowerCase())
+  )
 }
 
-// Composant NavMain optimisé avec détection automatique de l'état actif
+// Hook personnalisé pour vérifier si une URL est active
+function useIsActive(url: string, exact: boolean = false): boolean {
+  const pathname = usePathname()
+
+  if (!url || url === "#") return false
+
+  if (exact) {
+    return pathname === url
+  }
+
+  return pathname.startsWith(url)
+}
+
+// Composant pour un item de navigation simple
+function SimpleNavItem({
+  item,
+  isActive,
+}: {
+  item: (typeof data.navMain)[0]
+  isActive: boolean
+}) {
+  return (
+    <SidebarMenuItem>
+      <SidebarNavButton
+        href={item.url}
+        tooltip={item.title}
+        isActive={isActive}
+      >
+        {item.icon && <item.icon />}
+        <span>{item.title}</span>
+      </SidebarNavButton>
+    </SidebarMenuItem>
+  )
+}
+
+// Composant pour un item de navigation avec sous-menus
+function CollapsibleNavItem({
+  item,
+  allowedSubItems,
+  isMainItemActive,
+  hasActiveSubItem,
+}: {
+  item: (typeof data.navMain)[0]
+  allowedSubItems: any[]
+  isMainItemActive: boolean
+  hasActiveSubItem: boolean
+}) {
+  const shouldBeOpen = isMainItemActive || hasActiveSubItem
+
+  return (
+    <Collapsible
+      asChild
+      defaultOpen={shouldBeOpen}
+      className="group/collapsible"
+    >
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarNavButton
+            href={item.url !== "#" ? item.url : undefined}
+            tooltip={item.title}
+            isActive={isMainItemActive}
+          >
+            {item.icon && <item.icon />}
+            <span>{item.title}</span>
+            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarNavButton>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {allowedSubItems.map((subItem) => {
+              const isSubItemActive = useIsActive(subItem.url, false)
+              return (
+                <SidebarMenuSubItem key={subItem.title}>
+                  <SidebarNavSubButton
+                    href={subItem.url}
+                    isActive={isSubItemActive}
+                  >
+                    <span>{subItem.title}</span>
+                  </SidebarNavSubButton>
+                </SidebarMenuSubItem>
+              )
+            })}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
+  )
+}
+
+// Composant NavMain optimisé avec hooks appelés correctement
 function NavMain({
   items,
   userProfile,
 }: {
   items: typeof data.navMain
-  userProfile: string
+  userProfile: string | undefined
 }) {
+  // ✅ Hook appelé une seule fois au début du composant
+  const pathname = usePathname()
+
+  // ✅ Fonction utilitaire qui n'utilise pas de hooks
+  const isUrlActive = React.useCallback(
+    (url: string, exact: boolean = false): boolean => {
+      if (!url || url === "#") return false
+
+      if (exact) {
+        return pathname === url
+      }
+
+      return pathname.startsWith(url)
+    },
+    [pathname]
+  )
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Navigation</SidebarGroupLabel>
@@ -139,8 +252,8 @@ function NavMain({
             // Détecter si c'est un item avec sous-menus
             const hasSubItems = allowedSubItems.length > 0
 
-            // Utiliser le hook pour détecter l'état actif
-            const isMainItemActive = useIsActive(
+            // ✅ Utiliser la fonction utilitaire au lieu du hook
+            const isMainItemActive = isUrlActive(
               item.url !== "#" ? item.url : "",
               false
             )
@@ -148,56 +261,28 @@ function NavMain({
             // Pour les items avec sous-menus, vérifier si un sous-item est actif
             const hasActiveSubItem =
               hasSubItems &&
-              allowedSubItems.some((subItem) => useIsActive(subItem.url, false))
+              allowedSubItems.some((subItem) => isUrlActive(subItem.url, false))
 
-            // Déterminer si le collapsible doit être ouvert par défaut
-            const shouldBeOpen = isMainItemActive || hasActiveSubItem
-
-            // Si c'est un item simple (comme Dashboard), utiliser directement SidebarNavButton
+            // Si c'est un item simple (comme Dashboard)
             if (!hasSubItems) {
               return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarNavButton href={item.url} tooltip={item.title}>
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                  </SidebarNavButton>
-                </SidebarMenuItem>
+                <SimpleNavItem
+                  key={item.title}
+                  item={item}
+                  isActive={isMainItemActive}
+                />
               )
             }
 
-            // Pour les items avec sous-menus, utiliser Collapsible
+            // Pour les items avec sous-menus
             return (
-              <Collapsible
+              <CollapsibleNavItem
                 key={item.title}
-                asChild
-                defaultOpen={shouldBeOpen}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarNavButton
-                      href={item.url !== "#" ? item.url : undefined}
-                      tooltip={item.title}
-                    >
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarNavButton>
-                  </CollapsibleTrigger>
-
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {allowedSubItems.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarNavSubButton href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </SidebarNavSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                item={item}
+                allowedSubItems={allowedSubItems}
+                isMainItemActive={isMainItemActive}
+                hasActiveSubItem={hasActiveSubItem}
+              />
             )
           })}
         </SidebarMenu>
@@ -207,16 +292,17 @@ function NavMain({
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, logout } = useAuth()
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} userProfile="ADMIN" />
+        <NavMain items={data.navMain} userProfile={user?.role} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} onClick={logout} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
