@@ -1,3 +1,4 @@
+import { withAuth } from '@/lib/middleware'
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
@@ -12,7 +13,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export const POST = withAuth(async (req) => {
   const body = await req.json()
   const { label, type, description, content, eventDate } = body
   
@@ -21,4 +22,4 @@ export async function POST(req: Request) {
   })
 
   return NextResponse.json(news)
-}
+})
