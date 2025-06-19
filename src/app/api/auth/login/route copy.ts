@@ -5,12 +5,13 @@ import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
-    console.log('{ email, password }', email, password)
+    console.log('email', email, 'password', password)
     // Validation des champs
     if (!email || !password) {
       return NextResponse.json(
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier le mot de passe
     const isValidPassword = await bcrypt.compare(password, user.password);
-    
+    console.log('isValidPassword', isValidPassword)
     if (!isValidPassword) {
       return NextResponse.json(
         { error: 'Mot de passe incorrect' },
@@ -53,22 +54,10 @@ export async function POST(request: NextRequest) {
     // Retourner les données utilisateur (sans le mot de passe)
     const { password: _, ...userWithoutPassword } = user;
 
-    // Créer la réponse avec le cookie
-    const response = NextResponse.json({
+    return NextResponse.json({
       token,
       user: userWithoutPassword
     });
-
-    // Définir le cookie avec le token
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,    // Sécurisé contre XSS
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production
-      sameSite: 'strict', // Protection CSRF
-      maxAge: 60 * 60 * 24, // 1 jour en secondes
-      path: '/'
-    });
-
-    return response;
 
   } catch (error) {
     console.error('Erreur lors de la connexion:', error);
