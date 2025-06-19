@@ -68,15 +68,15 @@ const data = {
           requiredProfile: "ADMIN;super_admin",
         },
         {
-          title: "Demande",
+          title: "Documents",
           url: "/admin/demand",
           requiredProfile: "ADMIN;AGENT;super_admin",
         },
-        {
-          title: "Note de service",
-          url: "/admin/note",
-          requiredProfile: "ADMIN;AGENT;super_admin",
-        },
+        // {
+        //   title: "Note de service",
+        //   url: "/admin/note",
+        //   requiredProfile: "ADMIN;AGENT;super_admin",
+        // },
       ],
     },
     {
