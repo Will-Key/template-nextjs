@@ -69,7 +69,7 @@ const data = {
         },
         {
           title: "Documents",
-          url: "/admin/demand",
+          url: "/admin/docs",
           requiredProfile: "ADMIN;AGENT;super_admin",
         },
         // {

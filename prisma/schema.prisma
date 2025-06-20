@@ -44,6 +44,7 @@ model User {
   Service   Service[]
   Formation Formation[]
   News      News[]
+  Docs      Docs[]
 }
 
 model Service {
@@ -84,4 +85,18 @@ model News {
   eventDate   DateTime
   createdBy   User?    @relation(fields: [createdById], references: [id])
   createdById String?
+}
+
+model Docs {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  name         String
+  filename     String
+  filePath     String
+  originalName String
+  fileSize     Int
+  mimeType     String
+  createdBy    User     @relation(fields: [createdById], references: [id])
+  createdById  String
 }

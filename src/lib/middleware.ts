@@ -1,15 +1,10 @@
 // lib/middleware.ts - Version avec types complets
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAuth } from './auth/verifyAuth'
-import { Role } from '@prisma/client'
+import { AuthUser } from './types/auth'
 
 // Types pour les utilisateurs
-export interface AuthUser {
-  userId: string
-  email: string
-  role: Role
-  name?: string
-}
+
 
 // Types pour les handlers
 export type AuthenticatedHandler<T = any> = (

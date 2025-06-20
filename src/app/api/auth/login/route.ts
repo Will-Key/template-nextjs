@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
-    console.log('{ email, password }', email, password)
+
     // Validation des champs
     if (!email || !password) {
       return NextResponse.json(
@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
 
     // Rechercher l'utilisateur
     const user = await prisma.user.findUnique({ where: { email } })
-    console.log('user', user)
     if (!user) {
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },

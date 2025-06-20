@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,40 +9,42 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { Trash2 } from "lucide-react"
 
 interface DeleteConfirmationInterface {
-  itemName: string;
-  onDelete: () => void;
-  buttonLabel: string;
+  itemName: string
+  isDeleting?: boolean
+  onDelete: () => void
+  buttonLabel: string
   buttonVariant:
     | "outline"
     | "default"
     | "link"
     | "destructive"
     | "secondary"
-    | "ghost";
-  buttonSize: "default" | "sm" | "lg" | "icon" | null | undefined;
-  showIcon: boolean;
+    | "ghost"
+  buttonSize: "default" | "sm" | "lg" | "icon" | null | undefined
+  showIcon: boolean
 }
 
 // Composant de boîte de dialogue de confirmation de suppression
 export default function DeleteConfirmationDialog({
   itemName = "cet élément",
-  onDelete = () => console.log("Élément supprimé"),
+  isDeleting = false,
+  onDelete = () => {},
   buttonLabel = "Supprimer",
   buttonVariant = "outline",
   buttonSize = "default",
   showIcon = true,
 }: DeleteConfirmationInterface) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   const handleConfirmDelete = () => {
-    onDelete();
-    setOpen(false);
-  };
+    onDelete()
+    setOpen(false)
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -72,10 +74,10 @@ export default function DeleteConfirmationDialog({
             onClick={handleConfirmDelete}
             className="bg-red-500 hover:bg-red-600"
           >
-            Supprimer
+            {isDeleting ? "Suppression en cours..." : "Supprimer"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }
