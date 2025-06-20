@@ -142,7 +142,7 @@ export default function Page() {
 
   return (
     <div>
-      <AppHeader parent="Site" child="Docs" />
+      <AppHeader parent="Administration" child="Docs" />
       <div className="mt-4 p-5 flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Docs</h1>
         <Dialog open={open} onOpenChange={setOpen}>

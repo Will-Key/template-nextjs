@@ -1,4 +1,4 @@
-import { Docs, News } from "@prisma/client"
+import { Docs, News, User } from "@prisma/client"
 
 // Définir les types pour notre API
 export type Formation = {
@@ -11,16 +11,6 @@ export type Formation = {
   modules: string[]
   status: "published" | "draft" | "archived"
   createdAt: string
-}
-
-export type User = {
-  id: string
-  name: string
-  email: string
-  role: "admin" | "user" | "manager"
-  status: "active" | "inactive"
-  lastLogin: string
-  avatar?: string
 }
 
 // Classe de base pour les services API
@@ -145,7 +135,7 @@ export class FormationsService extends BaseApiService<Formation> {
 // Service pour les utilisateurs
 export class UsersService extends BaseApiService<User> {
   constructor() {
-    super('users')
+    super('agents')
   }
   
   // Méthodes spécifiques aux utilisateurs

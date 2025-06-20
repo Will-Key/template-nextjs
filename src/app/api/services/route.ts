@@ -2,18 +2,18 @@ import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { writeFile } from "fs/promises";
 import path from "path";
-import { withAuth } from '@/lib/middleware'
+import { CORS_CONFIG, withAuth, withCors } from '@/lib/middleware'
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export const GET = withCors(async () => {
   try {
     const services = await prisma.service.findMany()
     return NextResponse.json(services)
   } catch (error) {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
-}
+}, CORS_CONFIG.public)
 
 export const POST = withAuth(async (req: Request) => {
   
