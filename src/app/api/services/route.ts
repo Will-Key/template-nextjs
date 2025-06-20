@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { writeFile } from "fs/promises";
 import path from "path";
+import { withAuth } from '@/lib/middleware'
 
 const prisma = new PrismaClient()
 
@@ -14,7 +15,8 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export const POST = withAuth(async (req: Request) => {
+  
   try {
     const contentType = req.headers.get("content-type") || "";
 
@@ -33,7 +35,6 @@ export async function POST(req: Request) {
     if (contentType.includes("multipart/form-data")) {
       // 🔹 Mode FormData (avec image)
       const formData = await req.formData();
-      console.log('formData', formData)
       const label = formData.get("label")?.toString() || "";
       const description = formData.get("description")?.toString() || "";
       const content = formData.get("content")?.toString().split(',') || [];
@@ -75,4 +76,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
+})

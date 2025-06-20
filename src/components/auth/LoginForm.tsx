@@ -40,16 +40,14 @@ const LoginForm: React.FC = () => {
         className="absolute inset-0"
         style={{
           backgroundImage: "url('/images/img07.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       />
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div className="relative max-w-md w-full space-y-8">
-        <div
-          className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-10 rounded-xl shadow-2xl max-h-screen overflow-auto"
-        >
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-10 rounded-xl shadow-2xl max-h-screen overflow-auto">
           <div className="space-y-8">
             <div>
               <img
