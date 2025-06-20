@@ -26,7 +26,7 @@ function addCorsHeaders(response: NextResponse, options: CorsOptions = DEFAULT_C
     allowedHeaders = ['Content-Type', 'Authorization'],
     credentials = true
   } = options
-
+  console.log('options', options)
   // Gérer les origines multiples
   if (Array.isArray(origin)) {
     response.headers.set('Access-Control-Allow-Origin', origin.join(', '))
@@ -202,7 +202,7 @@ export function withCors<T = any>(
     if (req.method === 'OPTIONS') {
       return handlePreflight(req, corsOptions)
     }
-
+    console.log('corsOptions', corsOptions)
     try {
       const response = await handler(req, context)
       return addCorsHeaders(response, corsOptions)
