@@ -58,6 +58,7 @@ const LoginForm: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+
             <div>
               <label htmlFor="password" className="sr-only">
                 Mot de passe

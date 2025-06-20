@@ -28,9 +28,7 @@ export const GET = withAuth<ServiceParams>(async (_, { params }) => {
 
 export const PUT = withAuth<ServiceParams>(async (req, { params }) => {
   try {
-    const contentType = req.headers.get("content-type") || "";
-    console.log("Received content type:", contentType);
-    
+    const contentType = req.headers.get("content-type") || "";    
     // Check if it's a multipart request by checking if it starts with multipart/form-data
     // This is more reliable than using .includes()
     if (!contentType.includes("multipart/form-data")) {
@@ -43,7 +41,6 @@ export const PUT = withAuth<ServiceParams>(async (req, { params }) => {
     
     try {
       const formData = await req.formData();
-      console.log("FormData keys:", [...formData.keys()]);
       
       const label = formData.get("label")?.toString() || "";
       const description = formData.get("description")?.toString() || "";
@@ -51,7 +48,6 @@ export const PUT = withAuth<ServiceParams>(async (req, { params }) => {
       // Handle content array properly
       let content: string[] = [];
       const contentValue = formData.get("content");
-      console.log("Content value:", contentValue);
       
       if (contentValue) {
         if (typeof contentValue === "string") {

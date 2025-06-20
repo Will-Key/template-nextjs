@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -8,18 +8,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
-import { ServiceFormProps } from "./model";
-import { FormChipsInput } from "@/components/ui/form-chips-input";
-import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { z } from "zod"
+import { ServiceFormProps } from "./model"
+import { FormChipsInput } from "@/components/ui/form-chips-input"
+import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor"
+import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
   label: z.string().min(3, {
@@ -30,7 +30,7 @@ const formSchema = z.object({
   }),
   content: z.array(z.string()).min(1, "Au moins un contenu"),
   image: z.any().optional(),
-});
+})
 
 export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,10 +41,10 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
       content: [],
       image: undefined,
     },
-  });
+  })
 
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (service) {
@@ -53,46 +53,43 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
         description: service.description,
         content: service.content,
         image: service.image,
-      });
+      })
     }
-  }, [service, form]);
+  }, [service, form])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const formData = new FormData();
-      console.log(values);
-      formData.append("label", values.label);
-      formData.append("description", values.description);
-      formData.append("content", values.content.join(","));
-      if (file) formData.append("image", file);
+      const formData = new FormData()
+      formData.append("label", values.label)
+      formData.append("description", values.description)
+      formData.append("content", values.content.join(","))
+      if (file) formData.append("image", file)
 
-      const endpoint = service
-        ? `/api/services/${service.id}`
-        : "/api/services";
-      const method = service ? "PUT" : "POST";
+      const endpoint = service ? `/api/services/${service.id}` : "/api/services"
+      const method = service ? "PUT" : "POST"
 
       const res = await fetch(endpoint, {
         method,
         body: formData,
-      });
+      })
 
       if (res.ok) {
-        toast.success(`Service ${service ? "modifié" : "créé"} avec succès`);
-        form.reset();
-        setFile(null);
-        onSuccess?.();
+        toast.success(`Service ${service ? "modifié" : "créé"} avec succès`)
+        form.reset()
+        setFile(null)
+        onSuccess?.()
       } else {
-        const errorData = await res.json().catch(() => ({}));
-        toast.error(errorData.error || "Une erreur est survenue");
+        const errorData = await res.json().catch(() => ({}))
+        toast.error(errorData.error || "Une erreur est survenue")
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Une erreur est survenue lors de la soumission");
+      console.error("Error submitting form:", error)
+      toast.error("Une erreur est survenue lors de la soumission")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Form {...form}>
@@ -168,5 +165,5 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
         </div>
       </form>
     </Form>
-  );
+  )
 }

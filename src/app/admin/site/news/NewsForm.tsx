@@ -19,7 +19,6 @@ import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { DatePicker } from "@/components/ui/date-picker"
-import { Calendar } from "lucide-react"
 
 const newsSchema = z.object({
   label: z.string().min(3, {

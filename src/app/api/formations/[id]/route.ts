@@ -43,7 +43,6 @@ export const PUT = withAuth<FormationParams>(async (req, { params }) => {
 
 export const DELETE = withAuth<FormationParams>(async (req, { params }) => {
   try {
-    console.log('params', params)
     const formation = await prisma.formation.delete({
       where: { id: Number((params.id)) },
     });

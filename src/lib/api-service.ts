@@ -1,4 +1,4 @@
-import { News } from "@prisma/client"
+import { Docs, News } from "@prisma/client"
 
 // Définir les types pour notre API
 export type Formation = {
@@ -38,7 +38,7 @@ export abstract class BaseApiService<T> {
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`)
       }
-      
+
       return await response.json()
     } catch (error) {
       console.error(`Erreur lors de la récupération des données:`, error)
@@ -165,6 +165,12 @@ export class UsersService extends BaseApiService<User> {
   }
 }
 
+export class DocsService extends BaseApiService<Docs> {
+  constructor() {
+    super('docs')
+  }
+}
+
 export class NewsService extends BaseApiService<News> {
   constructor() {
     super('news')
@@ -175,3 +181,4 @@ export class NewsService extends BaseApiService<News> {
 export const formationsService = new FormationsService()
 export const usersService = new UsersService()
 export const newsServices = new NewsService()
+export const docsService = new DocsService()

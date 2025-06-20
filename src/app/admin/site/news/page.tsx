@@ -1,44 +1,44 @@
-"use client";
+"use client"
 
-import AppHeader from "@/components/app-header";
-import { News } from "./models";
-import { useEffect, useState } from "react";
+import AppHeader from "@/components/app-header"
+import { News } from "./models"
+import { useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { newsServices } from "@/lib/api-service";
-import { FetchingDataTable } from "@/components/ui/fetching-data-table";
-import { toast } from "sonner";
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { newsServices } from "@/lib/api-service"
+import { FetchingDataTable } from "@/components/ui/fetching-data-table"
+import { toast } from "sonner"
 import {
   createActionsColumn,
   createColumn,
   createDateColumn,
-} from "@/lib/column-helpers";
-import { Eye, Pencil } from "lucide-react";
-import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog";
-import NewsForm from "./NewsForm";
+} from "@/lib/column-helpers"
+import { Eye, Pencil } from "lucide-react"
+import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog"
+import NewsForm from "./NewsForm"
 
 export default function Page() {
-  const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new");
-  const [selectedNews, setSelectedNews] = useState<News | null>(null);
-  const [open, setOpen] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<number>(0);
+  const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new")
+  const [selectedNews, setSelectedNews] = useState<News | null>(null)
+  const [open, setOpen] = useState<boolean>(false)
+  const [refresh, setRefresh] = useState<number>(0)
 
   const handleDeleteNews = async (NewsId: string) => {
     try {
-      await newsServices.delete(NewsId);
-      toast.success("News supprimée avec succès");
-      fetchNews();
-      setRefresh((prev) => prev + 1);
+      await newsServices.delete(NewsId)
+      toast.success("News supprimée avec succès")
+      fetchNews()
+      setRefresh((prev) => prev + 1)
     } catch (error) {
-      toast.error("Erreur lors de la suppression");
+      toast.error("Erreur lors de la suppression")
     }
-  };
+  }
 
   // Définition des colonnes en utilisant les helpers
   const columns = [
@@ -56,14 +56,14 @@ export default function Page() {
         label: "Voir",
         icon: Eye,
         onClick: (News) => {
-          handleOpenForm(News, "view");
+          handleOpenForm(News, "view")
         },
       },
       {
         label: "Modifier",
         icon: Pencil,
         onClick: (News) => {
-          handleOpenForm(News, "edit");
+          handleOpenForm(News, "edit")
         },
       },
       {
@@ -80,30 +80,30 @@ export default function Page() {
         ),
       },
     ]),
-  ];
+  ]
 
   const fetchNews = async () => {
-    return await newsServices.getAll();
-  };
+    return await newsServices.getAll()
+  }
 
   const handleOpenForm = (
     News: News | null = null,
     formMode: "new" | "edit" | "view"
   ) => {
-    setFormMode(formMode);
-    setSelectedNews(News);
-    setOpen(true);
-  };
+    setFormMode(formMode)
+    setSelectedNews(News)
+    setOpen(true)
+  }
 
   const handleSuccess = () => {
-    setOpen(false);
-    fetchNews();
-    setRefresh(refresh + 1);
-  };
+    setOpen(false)
+    fetchNews()
+    setRefresh(refresh + 1)
+  }
 
   useEffect(() => {
-    fetchNews();
-  }, []);
+    fetchNews()
+  }, [])
 
   return (
     <div>
@@ -148,5 +148,5 @@ export default function Page() {
         />
       </div>
     </div>
-  );
+  )
 }
