@@ -90,6 +90,8 @@ export default function NewsForm({
     try {
       const formData = new FormData()
       formData.append("label", values.label)
+      formData.append("type", values.type)
+      formData.append("eventDate", values.eventDate.toDateString())
       formData.append("description", values.description)
       formData.append("content", values.content)
       if (file) formData.append("image", file)
