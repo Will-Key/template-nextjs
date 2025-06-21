@@ -5,6 +5,7 @@ export interface News {
   description: string
   content: string
   eventDate: Date
+  image?: string;
 }
 
 export interface NewsFormProps {
