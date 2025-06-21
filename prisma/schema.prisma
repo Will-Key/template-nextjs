@@ -92,6 +92,7 @@ model News {
   description String   @db.VarChar(150)
   content     String
   eventDate   DateTime
+  image       String?
   createdBy   User?    @relation(fields: [createdById], references: [id])
   createdById String?
 }
