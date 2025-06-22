@@ -5,14 +5,17 @@ import bcrypt from 'bcryptjs'
 import { verifyAuth } from "@/lib/auth/verifyAuth"
 
 const prisma = new PrismaClient();
-interface UserParams {
+
+// Fix 1: Interface for the route params
+interface AgentParams {
   id: string
 }
 
-export const GET = withAuth<UserParams>(async (_, { params }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const GET = withAuth<AgentParams>(async (_, context) => {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: context.params.id },
     });
 
     if (!user) {
@@ -26,26 +29,36 @@ export const GET = withAuth<UserParams>(async (_, { params }) => {
   }
 })
 
-export const PUT = withAuth<UserParams>(async (req, { params }) => {
-  const { userId } = await verifyAuth(req)
-  
-  const body: User = await req.json();
-  const { name, email, password, role, status } = body;
-  
-  const hashedPassword = await bcrypt.hash(password, 10)
+export const PUT = withAuth<AgentParams>(async (req, context) => {
+  try {
+    
+    const body: User = await req.json();
+    const { name, email, password, role, status } = body;
+    
+    // Fix 3: Only hash password if it's provided
+    const updateData: any = { name, email, role, status, createdById: context.params.id };
+    
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
 
-  const updatedUser = await prisma.user.update({
-    where: { id: params.id },
-    data: { name, email, password: hashedPassword, role, status, createdById: userId },
-  });
+    const updatedUser = await prisma.user.update({
+      where: { id: context.params.id },
+      data: updateData,
+    });
 
-  return NextResponse.json(updatedUser);
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+  }
 })
 
-export const DELETE = withAuth<UserParams>(async (req, { params }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const DELETE = withAuth<AgentParams>(async (_, context) => {
   try {
     const user = await prisma.user.delete({
-      where: { id: params.id },
+      where: { id: context.params.id },
     });
 
     return NextResponse.json({ message: "User supprimé", user });
