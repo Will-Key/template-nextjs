@@ -1,11 +1,9 @@
-// app/login/page.tsx
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import LoginForm from "../../components/auth/LoginForm"
 import { useAuth } from "../../lib/auth/AuthContext"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 
 const LoginPage = () => {
   const { isAuthenticated, loading } = useAuth()
@@ -29,7 +27,13 @@ const LoginPage = () => {
 
   // Si l'utilisateur est déjà connecté, ne pas afficher le formulaire
   if (isAuthenticated) {
-    return null
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p>Redirection en cours...</p>
+        </div>
+      </div>
+    )
   }
 
   return <LoginForm />

@@ -1,7 +1,6 @@
-// components/auth/LoginForm.tsx
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import { useAuth } from "../../lib/auth/AuthContext"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -12,28 +11,69 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
   const { login } = useAuth()
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
 
-    try {
-      const success = await login(email, password)
-      if (success) {
-        router.push("/admin/dashboard")
-      } else {
-        setError("Email ou mot de passe incorrect")
+      // Éviter les soumissions multiples
+      if (loading || isSubmitted) {
+        return
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      setError("Une erreur est survenue lors de la connexion")
-    } finally {
-      setLoading(false)
-    }
-  }
+
+      setError("")
+      setLoading(true)
+      setIsSubmitted(true)
+
+      console.log("Début de la soumission du formulaire")
+
+      try {
+        const success = await login(email, password)
+        console.log("Résultat du login:", success)
+
+        if (success) {
+          console.log("Login réussi, redirection...")
+          // Ne pas réinitialiser les états ici pour éviter le flash
+          router.push("/admin/dashboard")
+        } else {
+          console.log("Login échoué")
+          setError("Email ou mot de passe incorrect")
+          setLoading(false)
+          setIsSubmitted(false)
+        }
+      } catch (error) {
+        console.error("Erreur lors de la connexion:", error)
+
+        let errorMessage = "Une erreur est survenue lors de la connexion"
+
+        if (error instanceof Error) {
+          errorMessage = error.message
+        } else if (typeof error === "string") {
+          errorMessage = error
+        }
+
+        setError(errorMessage)
+        setLoading(false)
+        setIsSubmitted(false)
+      }
+      // Ne pas mettre finally ici pour éviter de réinitialiser loading prématurément
+    },
+    [email, password, login, router, loading, isSubmitted]
+  )
+
+  // Debug pour voir les re-renders
+  console.log(
+    "LoginForm render - loading:",
+    loading,
+    "error:",
+    error,
+    "isSubmitted:",
+    isSubmitted
+  )
 
   return (
     <div className="h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -54,6 +94,8 @@ const LoginForm: React.FC = () => {
               <Image
                 src="/images/logoss.png"
                 alt="SSISPRO Logo"
+                width={20}
+                height={20}
                 className="mx-auto h-20 w-auto mb-4"
               />
             </div>
@@ -66,7 +108,7 @@ const LoginForm: React.FC = () => {
               </p>
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-              <div className=" space-y-4">
+              <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="sr-only">
                     Adresse email
@@ -81,7 +123,8 @@ const LoginForm: React.FC = () => {
                       type="email"
                       autoComplete="email"
                       required
-                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80"
+                      disabled={loading}
+                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
                       placeholder="Adresse email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -102,7 +145,8 @@ const LoginForm: React.FC = () => {
                       type="password"
                       autoComplete="current-password"
                       required
-                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80"
+                      disabled={loading}
+                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
                       placeholder="Mot de passe"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -111,19 +155,48 @@ const LoginForm: React.FC = () => {
                 </div>
               </div>
 
+              {/* Affichage de l'erreur */}
               {error && (
-                <div className="rounded-md bg-red-50 p-4">
-                  <div className="text-sm text-red-700">{error}</div>
+                <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+                  <div className="text-sm text-red-700 dark:text-red-400">
+                    {error}
+                  </div>
                 </div>
               )}
 
               <div>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="group relative w-full flex justify-center py-2 sm:py-2.5 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  disabled={loading || isSubmitted}
+                  className="group relative w-full flex justify-center py-2 sm:py-2.5 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Connexion..." : "Se connecter"}
+                  {loading ? (
+                    <span className="flex items-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Connexion...
+                    </span>
+                  ) : (
+                    "Se connecter"
+                  )}
                 </button>
               </div>
             </form>
