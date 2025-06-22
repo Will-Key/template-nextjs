@@ -13,6 +13,7 @@ import {
 import { ServiceForm } from "./ServiceForm"
 import { Service } from "./model"
 import ServiceList from "./ServiceList"
+import DataList from "@/components/ui/data-list"
 
 export default function Page() {
   const [open, setOpen] = useState(false)
@@ -76,13 +77,35 @@ export default function Page() {
           </DialogContent>
         </Dialog>
       </div>
-      <ServiceList
+      {/* <ServiceList
         services={services}
         onEdit={(service) => handleOpenForm(service)}
         onSuccess={handleSuccess}
         loading={loading}
         error={error}
         loadData={fetchServices}
+      /> */}
+      <DataList
+        data={services}
+        loading={loading}
+        error={error}
+        onEdit={(elt) => handleOpenForm(elt)}
+        onSuccess={fetchServices}
+        loadData={fetchServices}
+        titleField="label" // Utilise "label" au lieu de "title"
+        config={{
+          messages: {
+            editButton: "Modifier",
+            deleteButton: "Supprimer",
+            deleteSuccess: "Actualité supprimé avec succès !",
+            deleteError: "Erreur lors de la suppression !",
+            deleteConfirmDescription:
+              "Voulez-vous vraiment supprimer ce service ? Cette action est irréversible.",
+          },
+          api: {
+            deleteEndpoint: (id) => `/api/news/${id}`,
+          },
+        }}
       />
     </div>
   )

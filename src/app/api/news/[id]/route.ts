@@ -76,7 +76,7 @@ export const PUT = withAuth<NewsParams>(async (req, { params }) => {
           imagePath = `/uploads/${filename}`
         }
   
-        if (!label || !type || !description || !eventDate || !file) {
+        if (!label || !type || !description || !eventDate ) {
           return NextResponse.json(
             { error: "Champs requis manquants" },
             { status: 400 }

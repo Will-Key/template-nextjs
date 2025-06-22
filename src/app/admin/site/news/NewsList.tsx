@@ -97,7 +97,12 @@ export default function NewsList({
               </div>
             </CardContent>
             <CardFooter className="flex align-bottom justify-end gap-2">
-              <Button size="sm" variant="outline" onClick={() => onEdit(elt)}>
+              <Button
+                className="bg-primary dark:bg-primary text-white"
+                size="sm"
+                variant="outline"
+                onClick={() => onEdit(elt)}
+              >
                 Modifier
               </Button>
               {/* <Button

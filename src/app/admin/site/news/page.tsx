@@ -23,6 +23,7 @@ import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog
 import NewsForm from "./NewsForm"
 import NewsList from "./NewsList"
 import { News } from "@prisma/client"
+import DataList from "@/components/ui/data-list"
 
 export default function Page() {
   const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new")
@@ -155,8 +156,7 @@ export default function Page() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="mt-4 p-5">
-        {/* <FetchingDataTable<News, News>
+      {/* <FetchingDataTable<News, News>
           key={refresh}
           columns={columns}
           fetchData={fetchNews}
@@ -165,15 +165,36 @@ export default function Page() {
           emptyMessage="Aucune actualité disponible. Créez votre première actualité en cliquant sur le bouton ci-dessus."
           errorMessage="Impossible de charger les actualités"
         /> */}
-        <NewsList
+      {/* <NewsList
           news={news}
           onEdit={(elt) => handleOpenForm(elt, "edit")}
           onSuccess={handleSuccess}
           loading={loading}
           error={error}
           loadData={fetchNews}
-        />
-      </div>
+        /> */}
+      <DataList
+        data={news}
+        loading={loading}
+        error={error}
+        onEdit={(elt) => handleOpenForm(elt, "edit")}
+        onSuccess={fetchNews}
+        loadData={fetchNews}
+        titleField="label" // Utilise "label" au lieu de "title"
+        config={{
+          messages: {
+            editButton: "Modifier",
+            deleteButton: "Supprimer",
+            deleteSuccess: "Actualité supprimé avec succès !",
+            deleteError: "Erreur lors de la suppression !",
+            deleteConfirmDescription:
+              "Voulez-vous vraiment supprimer cette actualité ? Cette action est irréversible.",
+          },
+          api: {
+            deleteEndpoint: (id) => `/api/news/${id}`,
+          },
+        }}
+      />
     </div>
   )
 }

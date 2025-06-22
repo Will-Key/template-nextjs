@@ -167,8 +167,15 @@ export class NewsService extends BaseApiService<News> {
   }
 }
 
+export class ServicesService extends BaseApiService<News> {
+  constructor() {
+    super('services')
+  }
+}
+
 // Export des instances des services
 export const formationsService = new FormationsService()
 export const usersService = new UsersService()
 export const newsServices = new NewsService()
 export const docsService = new DocsService()
+export const servicesServices = new ServicesService()

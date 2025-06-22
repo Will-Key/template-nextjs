@@ -39,20 +39,24 @@ export const POST = withAuth(async (req) => {
       const description = formData.get("description")?.toString() || "";
       const eventDate = new Date(formData.get("eventDate")?.toString() || "");
       const content = formData.get("content")?.toString() || "";
-      const file = formData.get("image") as File | null;
+      const file = formData.get("image") as File;
 
-      if (!label || !description || !file) {
+      let imagePath: string | undefined = undefined
+      if (file && file.size > 0) {
+        const bytes = await file.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+        const filename = `${Date.now()}-${file.name}`
+        const filepath = path.join(process.cwd(), "public", "uploads", filename)
+        await writeFile(filepath, buffer)
+        imagePath = `/uploads/${filename}`
+      }
+
+      if (!label || !description || !type || !eventDate) {
         return NextResponse.json(
           { error: "Champs requis manquants" },
           { status: 400 }
         );
       }
-
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filename = `${Date.now()}-${file.name}`;
-      const filepath = path.join(process.cwd(), "public", "uploads", filename);
-      await writeFile(filepath, buffer);
 
       const news = await prisma.news.create({
         data: {
@@ -61,7 +65,7 @@ export const POST = withAuth(async (req) => {
           description,
           content,
           eventDate,
-          image: `/uploads/${filename}`,
+          image: imagePath,
         },
       });
 
