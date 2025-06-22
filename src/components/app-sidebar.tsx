@@ -72,11 +72,6 @@ const data = {
           url: "/admin/docs",
           requiredProfile: "ADMIN;AGENT;super_admin",
         },
-        // {
-        //   title: "Note de service",
-        //   url: "/admin/note",
-        //   requiredProfile: "ADMIN;AGENT;super_admin",
-        // },
       ],
     },
     {
@@ -166,17 +161,28 @@ function CollapsibleNavItem({
   hasActiveSubItem: boolean
 }) {
   const shouldBeOpen = isMainItemActive || hasActiveSubItem
+  const pathname = usePathname()
 
+  // ✅ Fonction utilitaire pour vérifier l'état actif
+  const isUrlActive = React.useCallback(
+    (url: string, exact: boolean = false): boolean => {
+      if (!url || url === "#") return false
+      if (exact) {
+        return pathname === url
+      }
+      return pathname.startsWith(url)
+    },
+    [pathname]
+  )
+
+  // ✅ Calculer les états actifs avec la fonction utilitaire
   const subItemsActiveStates = React.useMemo(
     () =>
-      allowedSubItems.map((subItem) => {
-        const isActive = useIsActive(subItem.url, false) // Hook appelé correctement
-        return {
-          ...subItem,
-          isActive,
-        }
-      }),
-    [allowedSubItems]
+      allowedSubItems.map((subItem) => ({
+        ...subItem,
+        isActive: isUrlActive(subItem.url, false),
+      })),
+    [allowedSubItems, isUrlActive]
   )
 
   return (
