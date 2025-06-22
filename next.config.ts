@@ -2,6 +2,19 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: 'standalone',
+  
+  // Autres configurations selon vos besoins
+  experimental: {
+    // Optimisations pour Docker
+    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+  },
+  
+  // Si vous utilisez des images
+  images: {
+    domains: ['localhost'],
+    // Ajoutez d'autres domaines si nécessaire
+  },
 };
 
 export default nextConfig;
