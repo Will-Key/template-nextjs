@@ -21,7 +21,6 @@ import {
 import { Eye, Pencil } from "lucide-react"
 import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog"
 import NewsForm from "./NewsForm"
-import NewsList from "./NewsList"
 import { News } from "@prisma/client"
 import DataList from "@/components/ui/data-list"
 
@@ -57,50 +56,51 @@ export default function Page() {
       setRefresh((prev) => prev + 1)
     } catch (error) {
       toast.error("Erreur lors de la suppression")
+      console.error(error)
     }
   }
 
   // Définition des colonnes en utilisant les helpers
-  const columns = [
-    createColumn<News>("label", "Libellé"),
+  // const columns = [
+  //   createColumn<News>("label", "Libellé"),
 
-    createColumn<News>("type", "Type d'évènement"),
+  //   createColumn<News>("type", "Type d'évènement"),
 
-    createDateColumn<News>("eventDate", "Date de l'évènement", {
-      dateStyle: "medium",
-      locale: "fr-FR",
-    }),
+  //   createDateColumn<News>("eventDate", "Date de l'évènement", {
+  //     dateStyle: "medium",
+  //     locale: "fr-FR",
+  //   }),
 
-    createActionsColumn<News>([
-      {
-        label: "Voir",
-        icon: Eye,
-        onClick: (News) => {
-          handleOpenForm(News, "view")
-        },
-      },
-      {
-        label: "Modifier",
-        icon: Pencil,
-        onClick: (News) => {
-          handleOpenForm(News, "edit")
-        },
-      },
-      {
-        label: "Supprimer",
-        renderButton: (News) => (
-          <DeleteConfirmationDialog
-            itemName={`l'actualité "${News.label}"`}
-            onDelete={() => handleDeleteNews(`${News.id}`)}
-            buttonLabel="Supprimer"
-            buttonVariant="ghost"
-            buttonSize="sm"
-            showIcon={false}
-          />
-        ),
-      },
-    ]),
-  ]
+  //   createActionsColumn<News>([
+  //     {
+  //       label: "Voir",
+  //       icon: Eye,
+  //       onClick: (News) => {
+  //         handleOpenForm(News, "view")
+  //       },
+  //     },
+  //     {
+  //       label: "Modifier",
+  //       icon: Pencil,
+  //       onClick: (News) => {
+  //         handleOpenForm(News, "edit")
+  //       },
+  //     },
+  //     {
+  //       label: "Supprimer",
+  //       renderButton: (News) => (
+  //         <DeleteConfirmationDialog
+  //           itemName={`l'actualité "${News.label}"`}
+  //           onDelete={() => handleDeleteNews(`${News.id}`)}
+  //           buttonLabel="Supprimer"
+  //           buttonVariant="ghost"
+  //           buttonSize="sm"
+  //           showIcon={false}
+  //         />
+  //       ),
+  //     },
+  //   ]),
+  // ]
 
   // const fetchNews = async () => {
   //   return await newsServices.getAll()

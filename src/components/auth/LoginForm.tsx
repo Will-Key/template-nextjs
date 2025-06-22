@@ -4,7 +4,7 @@
 import React, { useState } from "react"
 import { useAuth } from "../../lib/auth/AuthContext"
 import { useRouter } from "next/navigation"
-
+import Image from "next/image"
 import { Lock, Mail } from "lucide-react"
 
 const LoginForm: React.FC = () => {
@@ -27,6 +27,7 @@ const LoginForm: React.FC = () => {
       } else {
         setError("Email ou mot de passe incorrect")
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setError("Une erreur est survenue lors de la connexion")
     } finally {
@@ -50,10 +51,10 @@ const LoginForm: React.FC = () => {
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-10 rounded-xl shadow-2xl max-h-screen overflow-auto">
           <div className="space-y-8">
             <div>
-              <img
-                className="mx-auto h-20 w-auto mb-4"
+              <Image
                 src="/images/logoss.png"
                 alt="SSISPRO Logo"
+                className="mx-auto h-20 w-auto mb-4"
               />
             </div>
             <div>

@@ -50,6 +50,7 @@ function handlePreflight(req: NextRequest, corsOptions: CorsOptions = DEFAULT_CO
 }
 
 // Types pour les handlers
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AuthenticatedHandler<T = any> = (
   req: NextRequest,
   context: { params: T },
@@ -62,6 +63,7 @@ export type SimpleAuthenticatedHandler = (
 ) => Promise<NextResponse>
 
 // Middleware principal avec CORS et authentification
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAuth<T = any>(
   handler: AuthenticatedHandler<T>,
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
@@ -76,6 +78,7 @@ export function withAuth<T = any>(
       const user = await verifyAuth(req) as AuthUser
       const response = await handler(req, context, user)
       return addCorsHeaders(response, corsOptions)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Erreur d\'authentification:', error)
       const errorResponse = NextResponse.json(
@@ -102,6 +105,7 @@ export function withAuthSimple(
       const user = await verifyAuth(req) as AuthUser
       const response = await handler(req, user)
       return addCorsHeaders(response, corsOptions)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Erreur d\'authentification:', error)
       const errorResponse = NextResponse.json(
@@ -114,6 +118,7 @@ export function withAuthSimple(
 }
 
 // Middleware avec vérification de rôle et CORS
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAuthAndRole<T = any>(
   requiredRoles: AuthUser['role'] | AuthUser['role'][],
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
@@ -140,6 +145,7 @@ export function withAuthAndRole<T = any>(
         
         const response = await handler(req, context, user)
         return addCorsHeaders(response, corsOptions)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('Erreur d\'authentification:', error)
         const errorResponse = NextResponse.json(
@@ -179,6 +185,7 @@ export function withAuthAndRoleSimple(
         
         const response = await handler(req, user)
         return addCorsHeaders(response, corsOptions)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('Erreur d\'authentification:', error)
         const errorResponse = NextResponse.json(
@@ -192,6 +199,7 @@ export function withAuthAndRoleSimple(
 }
 
 // Middleware pour routes publiques avec CORS uniquement
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withCors<T = any>(
   handler: (req: NextRequest, context: { params: T }) => Promise<NextResponse>,
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
@@ -205,6 +213,7 @@ export function withCors<T = any>(
     try {
       const response = await handler(req, context)
       return addCorsHeaders(response, corsOptions)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Erreur dans le handler:', error)
       const errorResponse = NextResponse.json(
@@ -230,6 +239,7 @@ export function withCorsSimple(
     try {
       const response = await handler(req)
       return addCorsHeaders(response, corsOptions)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Erreur dans le handler:', error)
       const errorResponse = NextResponse.json(

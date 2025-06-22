@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import path from "path";
 import { writeFile } from "fs/promises";
@@ -22,6 +22,7 @@ export const GET = withAuth<ServiceParams>(async (_, { params }) => {
 
     return NextResponse.json(service);
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 })
@@ -83,12 +84,14 @@ export const PUT = withAuth<ServiceParams>(async (req, { params }) => {
       });
 
       return NextResponse.json(updatedService);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (formError: any) {
       return NextResponse.json(
         { error: "Error processing form data: " + (formError?.message || "Unknown error") },
         { status: 400 }
       );
     }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour: " + (error?.message || "Unknown error") },
@@ -104,7 +107,8 @@ export const DELETE = withAuth<ServiceParams>(async (_, { params }) => {
     });
 
     return NextResponse.json({ message: "Service supprimé", service });
-  } catch (error) {
-    return NextResponse.json({ error: "Erreur suppression" }, { status: 500 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return NextResponse.json({ error: "Erreur suppression" + (error?.message || "Unknown error")}, { status: 500 });
   }
 })

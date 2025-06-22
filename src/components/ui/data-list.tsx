@@ -22,6 +22,7 @@ import { ReactNode } from "react"
 // Types géneriques
 export interface BaseItem {
   id: number | string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -176,6 +177,7 @@ export default function DataList<T extends BaseItem>({
       } else {
         toast.error(messages.deleteError)
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error(messages.deleteError)
     }

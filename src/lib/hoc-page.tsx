@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   createColumn,
@@ -6,17 +6,11 @@ import {
   createDateColumn,
   createBadgeColumn,
   createActionsColumn,
-} from "@/lib/column-helpers";
-import {
-  formationsService,
-  usersService,
-  Formation,
-  User,
-} from "@/lib/api-service";
+} from "@/lib/column-helpers"
+import { formationsService, Formation } from "@/lib/api-service"
 
-import { Pencil, Trash, Eye } from "lucide-react";
-import { withDataTable } from "@/components/ui/with-data-table";
-import { FormationForm } from "@/app/admin/site/formation/FormationForm";
+import { Pencil, Trash, Eye } from "lucide-react"
+import { withDataTable } from "@/components/ui/with-data-table"
 
 // Exemple 1: Page de Formations
 export const FormationsPage = withDataTable<Formation>({
@@ -42,7 +36,7 @@ export const FormationsPage = withDataTable<Formation>({
         icon: Eye,
         onClick: (formation) => {
           // Naviguer vers la page de détails
-          window.location.href = `/formations/${formation.id}`;
+          window.location.href = `/formations/${formation.id}`
         },
       },
       {
@@ -51,7 +45,7 @@ export const FormationsPage = withDataTable<Formation>({
         onClick: (formation) => {
           // La logique de modification est gérée par le HOC
           // Il faut juste retourner l'élément à modifier
-          return formation;
+          return formation
         },
       },
       {
@@ -62,12 +56,13 @@ export const FormationsPage = withDataTable<Formation>({
             confirm(`Êtes-vous sûr de vouloir supprimer ${formation.label} ?`)
           ) {
             try {
-              await formationsService.delete(formation.id);
-              alert("Formation supprimée avec succès");
+              await formationsService.delete(formation.id)
+              alert("Formation supprimée avec succès")
               // Le rechargement est géré par le HOC
-              window.location.reload();
+              window.location.reload()
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
-              alert("Erreur lors de la suppression");
+              alert("Erreur lors de la suppression")
             }
           }
         },
@@ -82,7 +77,7 @@ export const FormationsPage = withDataTable<Formation>({
   editTitle: "Modifier la formation",
   createTitle: "Créer une formation",
   dialogWidth: "md",
-});
+})
 
 // Exemple 2: Page d'Utilisateurs
 // export const UsersPage = withDataTable<User>({

@@ -1,23 +1,23 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useController, useFormContext } from "react-hook-form";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import * as React from "react"
+import { useController, useFormContext } from "react-hook-form"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import {
   FormControl,
   FormItem,
   FormLabel,
   FormDescription,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/ui/form"
 
 interface FormRichTextEditorProps {
-  name: string;
-  label?: string;
-  description?: string;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
+  name: string
+  label?: string
+  description?: string
+  placeholder?: string
+  className?: string
+  disabled?: boolean
 }
 
 export function FormRichTextEditor({
@@ -26,9 +26,8 @@ export function FormRichTextEditor({
   description,
   placeholder = "Write something...",
   className,
-  disabled,
 }: FormRichTextEditorProps) {
-  const { control } = useFormContext();
+  const { control } = useFormContext()
 
   const {
     field,
@@ -37,7 +36,7 @@ export function FormRichTextEditor({
     name,
     control,
     defaultValue: "",
-  });
+  })
 
   return (
     <FormItem className={className}>
@@ -54,5 +53,5 @@ export function FormRichTextEditor({
       {description && <FormDescription>{description}</FormDescription>}
       {error && <FormMessage>{error.message}</FormMessage>}
     </FormItem>
-  );
+  )
 }

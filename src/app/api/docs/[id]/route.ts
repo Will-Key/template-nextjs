@@ -36,7 +36,8 @@ export const DELETE = withAuth<DocParams>(async (_, { params }) => {
       
       try {
         fs.access(filePath, () => {});
-        fs.unlink(filePath, () => {});
+        fs.unlink(filePath, () => { });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (fileError: any) {
         if (fileError.code === 'ENOENT') {
           console.warn(`Fichier non trouvé: ${filePath}`);

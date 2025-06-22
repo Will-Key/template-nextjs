@@ -13,6 +13,7 @@ export const GET = withAuthSimple(async (req) => {
     const docs = await prisma.docs.findMany({ include: { createdBy: true}})
     return NextResponse.json(docs)
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 })

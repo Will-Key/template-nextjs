@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-async function getMeHandler(req: NextRequest, user: any) {
+async function getMeHandler(user: any) {
   try {
     // Récupérer les informations complètes de l'utilisateur
     const fullUser = await prisma.user.findUnique({

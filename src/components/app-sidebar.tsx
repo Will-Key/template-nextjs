@@ -160,11 +160,17 @@ function CollapsibleNavItem({
   hasActiveSubItem,
 }: {
   item: (typeof data.navMain)[0]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   allowedSubItems: any[]
   isMainItemActive: boolean
   hasActiveSubItem: boolean
 }) {
   const shouldBeOpen = isMainItemActive || hasActiveSubItem
+
+  const subItemsActiveStates = allowedSubItems.map((subItem) => ({
+    ...subItem,
+    isActive: useIsActive(subItem.url, false),
+  }))
 
   return (
     <Collapsible
@@ -187,19 +193,16 @@ function CollapsibleNavItem({
 
         <CollapsibleContent>
           <SidebarMenuSub>
-            {allowedSubItems.map((subItem) => {
-              const isSubItemActive = useIsActive(subItem.url, false)
-              return (
-                <SidebarMenuSubItem key={subItem.title}>
-                  <SidebarNavSubButton
-                    href={subItem.url}
-                    isActive={isSubItemActive}
-                  >
-                    <span>{subItem.title}</span>
-                  </SidebarNavSubButton>
-                </SidebarMenuSubItem>
-              )
-            })}
+            {subItemsActiveStates.map((subItem) => (
+              <SidebarMenuSubItem key={subItem.title}>
+                <SidebarNavSubButton
+                  href={subItem.url}
+                  isActive={subItem.isActive}
+                >
+                  <span>{subItem.title}</span>
+                </SidebarNavSubButton>
+              </SidebarMenuSubItem>
+            ))}
           </SidebarMenuSub>
         </CollapsibleContent>
       </SidebarMenuItem>

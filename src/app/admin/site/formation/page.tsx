@@ -1,48 +1,49 @@
-"use client";
+"use client"
 
-import AppHeader from "@/components/app-header";
-import { Button } from "@/components/ui/button";
-import { DialogHeader } from "@/components/ui/dialog";
+import AppHeader from "@/components/app-header"
+import { Button } from "@/components/ui/button"
+import { DialogHeader } from "@/components/ui/dialog"
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
-import { FormationForm } from "./FormationForm";
-import { FetchingDataTable } from "@/components/ui/fetching-data-table";
+} from "@/components/ui/dialog"
+import { useEffect, useState } from "react"
+import { FormationForm } from "./FormationForm"
+import { FetchingDataTable } from "@/components/ui/fetching-data-table"
 import {
   createActionsColumn,
   createBadgeColumn,
   createColumn,
   createCurrencyColumn,
   createDateColumn,
-} from "@/lib/column-helpers";
-import { Eye, Pencil, Trash } from "lucide-react";
-import { formationsService } from "@/lib/api-service";
-import { Formation } from "./model";
-import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog";
-import { toast } from "sonner";
+} from "@/lib/column-helpers"
+import { Eye, Pencil, Trash } from "lucide-react"
+import { formationsService } from "@/lib/api-service"
+import { Formation } from "./model"
+import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog"
+import { toast } from "sonner"
 
 export default function Page() {
-  const [open, setOpen] = useState(false);
-  const [refresh, setRefresh] = useState(0);
-  const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new");
+  const [open, setOpen] = useState(false)
+  const [refresh, setRefresh] = useState(0)
+  const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new")
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(
     null
-  );
+  )
 
   const handleDeleteFormation = async (formationId: string) => {
     try {
-      await formationsService.delete(formationId);
-      toast.success("Formation supprimée avec succès");
-      fetchFormations();
-      setRefresh((prev) => prev + 1);
+      await formationsService.delete(formationId)
+      toast.success("Formation supprimée avec succès")
+      fetchFormations()
+      setRefresh((prev) => prev + 1)
     } catch (error) {
-      toast.error("Erreur lors de la suppression");
+      toast.error("Erreur lors de la suppression")
+      console.error(error)
     }
-  };
+  }
 
   // Définition des colonnes en utilisant les helpers
   const columns = [
@@ -79,14 +80,14 @@ export default function Page() {
         label: "Voir",
         icon: Eye,
         onClick: (formation) => {
-          handleOpenForm(formation, "view");
+          handleOpenForm(formation, "view")
         },
       },
       {
         label: "Modifier",
         icon: Pencil,
         onClick: (formation) => {
-          handleOpenForm(formation, "edit");
+          handleOpenForm(formation, "edit")
         },
       },
       {
@@ -104,31 +105,31 @@ export default function Page() {
         ),
       },
     ]),
-  ];
+  ]
 
   // Fonction pour charger les données
   const fetchFormations = async () => {
-    return await formationsService.getAll();
-  };
+    return await formationsService.getAll()
+  }
 
   const handleOpenForm = (
     formation: Formation | null = null,
     formMode: "new" | "edit" | "view"
   ) => {
-    setFormMode(formMode);
-    setSelectedFormation(formation);
-    setOpen(true);
-  };
+    setFormMode(formMode)
+    setSelectedFormation(formation)
+    setOpen(true)
+  }
 
   const handleSuccess = () => {
-    setOpen(false);
-    fetchFormations();
-    setRefresh(refresh + 1);
-  };
+    setOpen(false)
+    fetchFormations()
+    setRefresh(refresh + 1)
+  }
 
   useEffect(() => {
-    fetchFormations();
-  }, []);
+    fetchFormations()
+  }, [])
 
   return (
     <div>
@@ -173,5 +174,5 @@ export default function Page() {
         />
       </div>
     </div>
-  );
+  )
 }

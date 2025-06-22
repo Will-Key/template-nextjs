@@ -149,7 +149,7 @@ export default function NewsForm({
           name="eventDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date de l'événement</FormLabel>
+              <FormLabel>{"Date de l'événement"}</FormLabel>
               <FormControl>
                 <DatePicker
                   value={field.value}
@@ -167,7 +167,7 @@ export default function NewsForm({
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type d'actialité</FormLabel>
+              <FormLabel>{"Type d'actialité"}</FormLabel>
               <FormControl>
                 <Input
                   placeholder="Entrer le type d'actualité"
@@ -213,6 +213,7 @@ export default function NewsForm({
                 <Input
                   type="file"
                   accept="image/*"
+                  {...field}
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 />
               </FormControl>

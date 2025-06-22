@@ -1,6 +1,5 @@
-import { verifyAuth } from '@/lib/auth/verifyAuth'
 import { withAuth, withAuthSimple } from '@/lib/middleware'
-import { PrismaClient, Role, User, UserStatus } from '@prisma/client'
+import { PrismaClient, Role, User } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 

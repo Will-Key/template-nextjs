@@ -10,8 +10,9 @@ export const GET = withCors(async () => {
   try {
     const services = await prisma.service.findMany()
     return NextResponse.json(services)
-  } catch (error) {
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Erreur serveur' + error?.message || "Unknown error" }, { status: 500 })
   }
 }, CORS_CONFIG.public)
 

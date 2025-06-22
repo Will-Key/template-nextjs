@@ -1,20 +1,20 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/ui/data-table";
-import { Loader2, AlertTriangle, RefreshCcw } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from "react"
+import { ColumnDef } from "@tanstack/react-table"
+import { DataTable } from "@/components/ui/data-table"
+import { Loader2, AlertTriangle, RefreshCcw } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 
 interface FetchingDataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  fetchData: () => Promise<TData[]>;
-  searchColumn?: string;
-  searchPlaceholder?: string;
-  title?: string;
-  emptyMessage?: string;
-  errorMessage?: string;
+  columns: ColumnDef<TData, TValue>[]
+  fetchData: () => Promise<TData[]>
+  searchColumn?: string
+  searchPlaceholder?: string
+  title?: string
+  emptyMessage?: string
+  errorMessage?: string
 }
 
 export function FetchingDataTable<TData, TValue>({
@@ -26,29 +26,29 @@ export function FetchingDataTable<TData, TValue>({
   emptyMessage = "Aucune donnée disponible",
   errorMessage = "Une erreur est survenue lors du chargement des données",
 }: FetchingDataTableProps<TData, TValue>) {
-  const [data, setData] = useState<TData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<TData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   const loadData = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const result = await fetchData();
-      setData(result);
+      setLoading(true)
+      setError(null)
+      const result = await fetchData()
+      setData(result)
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("Error fetching data:", err)
       setError(
         err instanceof Error ? err : new Error("Une erreur est survenue")
-      );
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData()
+  }, [loadData])
 
   if (loading) {
     return (
@@ -56,7 +56,7 @@ export function FetchingDataTable<TData, TValue>({
         <Loader2 className="h-8 w-8 animate-spin mr-2" />
         <p>Chargement des données...</p>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -75,7 +75,7 @@ export function FetchingDataTable<TData, TValue>({
           </div>
         </AlertDescription>
       </Alert>
-    );
+    )
   }
 
   if (data.length === 0) {
@@ -87,7 +87,7 @@ export function FetchingDataTable<TData, TValue>({
           Actualiser
         </Button>
       </div>
-    );
+    )
   }
 
   return (
@@ -100,5 +100,5 @@ export function FetchingDataTable<TData, TValue>({
         searchPlaceholder={searchPlaceholder}
       />
     </div>
-  );
+  )
 }

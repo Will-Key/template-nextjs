@@ -37,6 +37,7 @@ export default function Page() {
       setRefresh((prev) => prev + 1)
     } catch (error) {
       toast.error("Erreur lors de la suppression")
+      console.error(error)
     }
   }
 

@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Retourner les données utilisateur (sans le mot de passe)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user;
 
     // Créer la réponse avec le cookie
