@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { withAuth } from "@/lib/middleware"
 import { writeFile } from "fs/promises"
 import path from "path"
+import fs from 'fs'
 
 const prisma = new PrismaClient();
 
@@ -119,8 +120,34 @@ export const PUT = withAuth<NewsParams>(async (req, { params }) => {
 export const DELETE = withAuth<NewsParams>(async (_, { params }) => {
   try {
     const news = await prisma.news.delete({
-      where: { id: Number((params.id)) },
+      where: { id: Number((await params).id) },
     });
+
+    // Supprimer le fichier physique
+    if (news.image) {
+      console.log('news.image', news.image)
+      // Le fichier est maintenant stocké avec son extension
+      const filePath = path.join(process.cwd(), "public", news.image);
+      
+      try {
+        fs.access(filePath, () => {});
+        fs.unlink(filePath, () => {});
+      } catch (fileError: any) {
+        if (fileError.code === 'ENOENT') {
+          console.warn(`Fichier non trouvé: ${filePath}`);
+          return NextResponse.json(
+            { error: "Fichier non trouvé" },
+            { status: 400 }
+          );
+        } else {
+          console.error('Erreur lors de la suppression du fichier:', fileError);
+          return NextResponse.json(
+            { error: 'Erreur lors de la suppression du fichier:', fileError },
+            { status: 400 }
+          );
+        }
+      }
+    }
 
     return NextResponse.json({ message: "Actualité supprimé", news });
   } catch (error) {
