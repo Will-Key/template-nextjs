@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { newsServices } from "@/lib/api-service"
-import { toast } from "sonner"
 import NewsForm from "./NewsForm"
 import { News } from "@prisma/client"
 import DataList from "@/components/ui/data-list"
