@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { PrismaClient, User } from "@prisma/client";
 import { withAuth } from "@/lib/middleware"
 import bcrypt from 'bcryptjs'
-import { verifyAuth } from "@/lib/auth/verifyAuth"
 
 const prisma = new PrismaClient();
 
@@ -48,6 +47,7 @@ export const PUT = withAuth<AgentParams>(async (req, context) => {
     });
 
     return NextResponse.json(updatedUser);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error) {
     console.log(error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
