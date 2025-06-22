@@ -17,18 +17,34 @@ interface ChipsInputProps {
 }
 
 export const ChipsInput = React.forwardRef<HTMLInputElement, ChipsInputProps>(
-  ({
-    className,
-    value = [],
-    onValueChange,
-    placeholder,
-    disabled,
-    onBlur,
-    name,
-    ...props
-  }) => {
+  (
+    {
+      className,
+      value = [],
+      onValueChange,
+      placeholder,
+      disabled,
+      onBlur,
+      name,
+      ...props
+    },
+    ref // Ajout du paramètre ref
+  ) => {
     const [inputValue, setInputValue] = React.useState("")
     const inputRef = React.useRef<HTMLInputElement>(null)
+
+    // Fonction pour combiner les refs
+    const setRefs = React.useCallback(
+      (element: HTMLInputElement | null) => {
+        inputRef.current = element
+        if (typeof ref === "function") {
+          ref(element)
+        } else if (ref) {
+          ref.current = element
+        }
+      },
+      [ref]
+    )
 
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       // Add chip on Enter or comma
@@ -88,7 +104,7 @@ export const ChipsInput = React.forwardRef<HTMLInputElement, ChipsInputProps>(
           </div>
         ))}
         <Input
-          ref={inputRef}
+          ref={setRefs} // Utilisation de la fonction combinée
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

@@ -113,17 +113,17 @@ function hasPermission(
 }
 
 // Hook personnalisé pour vérifier si une URL est active
-function useIsActive(url: string, exact: boolean = false): boolean {
-  const pathname = usePathname()
+// function useIsActive(url: string, exact: boolean = false): boolean {
+//   const pathname = usePathname()
 
-  if (!url || url === "#") return false
+//   if (!url || url === "#") return false
 
-  if (exact) {
-    return pathname === url
-  }
+//   if (exact) {
+//     return pathname === url
+//   }
 
-  return pathname.startsWith(url)
-}
+//   return pathname.startsWith(url)
+// }
 
 // Composant pour un item de navigation simple
 function SimpleNavItem({

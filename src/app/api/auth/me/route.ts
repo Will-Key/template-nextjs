@@ -10,7 +10,7 @@ async function getMeHandler(user: any) {
   try {
     // Récupérer les informations complètes de l'utilisateur
     const fullUser = await prisma.user.findUnique({
-      where: { id: user.userId },
+      where: { id: user?.userId },
       select: {
         id: true,
         email: true,
