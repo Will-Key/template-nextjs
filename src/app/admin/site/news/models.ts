@@ -1,15 +1,17 @@
-export interface News {
-  id: number
-  label: string
-  type: string
-  description: string
-  content: string
-  eventDate: Date
-}
+import { News } from "@prisma/client"
+
 
 export interface NewsFormProps {
   news: News | null
   mode: 'new' | 'edit' | 'view'
   onClose?: () => void
   onSuccess?: () => void
+}
+export interface NewsListProps {
+  news: News[]
+  loading: boolean
+  error: Error | null
+  onEdit: (service: News) => void
+  onSuccess?: () => void
+  loadData: () => void
 }

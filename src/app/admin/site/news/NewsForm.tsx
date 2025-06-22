@@ -44,6 +44,7 @@ const newsSchema = z.object({
   content: z.string().min(100, {
     message: "Le contenu doit être au moins 100 caractères",
   }),
+  image: z.any().optional(),
 })
 
 type NewsFormValues = z.infer<typeof newsSchema>
@@ -62,8 +63,10 @@ export default function NewsForm({
       eventDate: new Date(),
       description: "",
       content: "",
+      image: undefined,
     },
   })
+  const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
@@ -74,6 +77,7 @@ export default function NewsForm({
         eventDate: news.eventDate,
         description: news.description,
         content: news.content,
+        image: news.image,
       })
     }
   }, [news, form])
@@ -84,13 +88,21 @@ export default function NewsForm({
     setLoading(true)
 
     try {
+      const formData = new FormData()
+      formData.append("label", values.label)
+      formData.append("type", values.type)
+      formData.append("eventDate", values.eventDate.toDateString())
+      formData.append("description", values.description)
+      formData.append("content", values.content)
+      if (file) formData.append("image", file)
+
       const endpoint = news ? `/api/news/${news.id}` : "/api/news"
 
       const method = news ? "PUT" : "POST"
 
       const res = await fetch(endpoint, {
         method,
-        body: JSON.stringify(values),
+        body: formData,
       })
 
       if (res.ok) {
@@ -190,6 +202,22 @@ export default function NewsForm({
           description=""
           placeholder="Ecrivez le contenu ici"
           disabled={mode === "view"}
+        />
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image illustrative</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
         />
         <div className="flex justify-end gap-2">
           <Button type="submit" disabled={loading}>
