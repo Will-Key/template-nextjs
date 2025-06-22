@@ -47,6 +47,7 @@ export const PUT = withAuth<AgentParams>(async (req, context) => {
     });
 
     return NextResponse.json(updatedUser);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error) {
     console.log(error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
