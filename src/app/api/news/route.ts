@@ -12,6 +12,7 @@ export const GET = withCors(async() => {
     return NextResponse.json(news)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    console.error(error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }, CORS_CONFIG.public)
@@ -77,7 +78,8 @@ export const POST = withAuth(async (req) => {
       { error: "Type de contenu non supporté" },
       { status: 415 }
     );
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error("POST error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la création" },

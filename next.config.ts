@@ -5,10 +5,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   
   // Autres configurations selon vos besoins
-  experimental: {
-    // Optimisations pour Docker
-    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
-  },
+  serverExternalPackages: ['@prisma/client', 'bcryptjs'],
   
   // Si vous utilisez des images
   images: {

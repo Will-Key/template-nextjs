@@ -69,12 +69,12 @@ export function withAuth<T = any>(
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
 ) {
   return async (req: NextRequest, context: { params: T }): Promise<NextResponse> => {
-    // Gérer les requêtes preflight OPTIONS
-    if (req.method === 'OPTIONS') {
-      return handlePreflight(req, corsOptions)
-    }
-
     try {
+      // Gérer les requêtes preflight OPTIONS
+      if (req.method === 'OPTIONS') {
+        return handlePreflight(req, corsOptions)
+      }
+      
       const user = await verifyAuth(req) as AuthUser
       const response = await handler(req, context, user)
       return addCorsHeaders(response, corsOptions)

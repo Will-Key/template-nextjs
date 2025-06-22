@@ -13,13 +13,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { newsServices } from "@/lib/api-service"
 import { toast } from "sonner"
-import {
-  createActionsColumn,
-  createColumn,
-  createDateColumn,
-} from "@/lib/column-helpers"
-import { Eye, Pencil } from "lucide-react"
-import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog"
 import NewsForm from "./NewsForm"
 import { News } from "@prisma/client"
 import DataList from "@/components/ui/data-list"
