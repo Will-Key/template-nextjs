@@ -7,18 +7,20 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+# Enable pnpm
+RUN corepack enable pnpm
+
 # Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm i --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Enable pnpm
+RUN corepack enable pnpm
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -27,12 +29,11 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+# Generate Prisma client before build
+RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; fi
+
+# Build with pnpm
+RUN pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -64,6 +65,35 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
+# Copy seed script and prisma files
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma 2>/dev/null || true
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
+# Enable pnpm in production
+RUN corepack enable pnpm
+
+# Copy pnpm and required modules for seed
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.pnpm ./node_modules/.pnpm
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/tsx ./node_modules/tsx
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+
+# Create startup script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+  echo 'echo "Starting application..."' >> /app/start.sh && \
+  echo 'if [ -f "./prisma/schema.prisma" ]; then' >> /app/start.sh && \
+  echo '  echo "Generating Prisma client..."' >> /app/start.sh && \
+  echo '  npx prisma generate' >> /app/start.sh && \
+  echo '  echo "Running database migrations..."' >> /app/start.sh && \
+  echo '  npx prisma migrate deploy' >> /app/start.sh && \
+  echo '  echo "Running database seed..."' >> /app/start.sh && \
+  echo '  pnpm run db:seed 2>/dev/null || echo "No seed script found, skipping..."' >> /app/start.sh && \
+  echo 'fi' >> /app/start.sh && \
+  echo 'echo "Starting Next.js server..."' >> /app/start.sh && \
+  echo 'exec node server.js' >> /app/start.sh && \
+  chmod +x /app/start.sh
+
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"]
+CMD ["/app/start.sh"]
