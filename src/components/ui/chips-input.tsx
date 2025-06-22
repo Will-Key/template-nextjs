@@ -1,62 +1,59 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import * as React from "react"
+import { X } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 interface ChipsInputProps {
-  value: string[];
-  onValueChange: (value: string[]) => void;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
-  onBlur?: () => void;
-  name?: string;
+  value: string[]
+  onValueChange: (value: string[]) => void
+  placeholder?: string
+  className?: string
+  disabled?: boolean
+  onBlur?: () => void
+  name?: string
 }
 
 export const ChipsInput = React.forwardRef<HTMLInputElement, ChipsInputProps>(
-  (
-    {
-      className,
-      value = [],
-      onValueChange,
-      placeholder,
-      disabled,
-      onBlur,
-      name,
-      ...props
-    },
-    ref
-  ) => {
-    const [inputValue, setInputValue] = React.useState("");
-    const inputRef = React.useRef<HTMLInputElement>(null);
+  ({
+    className,
+    value = [],
+    onValueChange,
+    placeholder,
+    disabled,
+    onBlur,
+    name,
+    ...props
+  }) => {
+    const [inputValue, setInputValue] = React.useState("")
+    const inputRef = React.useRef<HTMLInputElement>(null)
 
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       // Add chip on Enter or comma
       if ((e.key === "Enter" || e.key === ",") && inputValue.trim()) {
-        e.preventDefault();
+        e.preventDefault()
         if (!value.includes(inputValue.trim())) {
-          onValueChange([...value, inputValue.trim()]);
+          onValueChange([...value, inputValue.trim()])
         }
-        setInputValue("");
+        setInputValue("")
       }
 
       // Remove last chip on Backspace if input is empty
       if (e.key === "Backspace" && !inputValue && value.length > 0) {
-        onValueChange(value.slice(0, -1));
+        onValueChange(value.slice(0, -1))
       }
-    };
+    }
 
     const handleRemoveChip = (chipToRemove: string) => {
-      onValueChange(value.filter((chip) => chip !== chipToRemove));
-      if (onBlur) onBlur();
-    };
+      onValueChange(value.filter((chip) => chip !== chipToRemove))
+      if (onBlur) onBlur()
+    }
 
     const focusInput = () => {
-      inputRef.current?.focus();
-    };
+      inputRef.current?.focus()
+    }
 
     return (
       <div
@@ -80,8 +77,8 @@ export const ChipsInput = React.forwardRef<HTMLInputElement, ChipsInputProps>(
                 size="sm"
                 className="h-4 w-4 p-0 rounded-full"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveChip(chip);
+                  e.stopPropagation()
+                  handleRemoveChip(chip)
                 }}
               >
                 <X className="h-3 w-3" />
@@ -104,8 +101,8 @@ export const ChipsInput = React.forwardRef<HTMLInputElement, ChipsInputProps>(
           {...props}
         />
       </div>
-    );
+    )
   }
-);
+)
 
-ChipsInput.displayName = "ChipsInput";
+ChipsInput.displayName = "ChipsInput"

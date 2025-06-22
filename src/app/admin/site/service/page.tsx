@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog"
 import { ServiceForm } from "./ServiceForm"
 import { Service } from "./model"
-import ServiceList from "./ServiceList"
 import DataList from "@/components/ui/data-list"
 
 export default function Page() {

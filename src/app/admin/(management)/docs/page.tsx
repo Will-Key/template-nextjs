@@ -40,6 +40,7 @@ export default function Page() {
       }
     } catch (error) {
       toast.error("Erreur lors de la suppression")
+      console.error(error)
     }
   }
 
@@ -125,7 +126,7 @@ export default function Page() {
     }
   }
 
-  const handleOpenForm = (doc: Docs | null = null, formMode: "new") => {
+  const handleOpenForm = (formMode: "new") => {
     setFormMode(formMode)
     setOpen(true)
   }
@@ -147,7 +148,7 @@ export default function Page() {
         <h1 className="text-2xl font-semibold">Docs</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenForm(null, "new")}>
+            <Button onClick={() => handleOpenForm("new")}>
               Ajouter un document
             </Button>
           </DialogTrigger>

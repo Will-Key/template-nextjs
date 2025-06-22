@@ -23,6 +23,7 @@ export const GET = withAuth<NewsParams>(async (_, { params }) => {
 
     return NextResponse.json(news);
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 })
@@ -102,6 +103,7 @@ export const PUT = withAuth<NewsParams>(async (req, { params }) => {
         { error: "Type de contenu non supporté" },
         { status: 415 }
       )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (formError: any) {
       return NextResponse.json(
         { error: "Error processing form data: " + (formError?.message || "Unknown error") },
@@ -109,6 +111,7 @@ export const PUT = withAuth<NewsParams>(async (req, { params }) => {
       )
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   catch (error: any) {
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour: " + (error?.message || "Unknown error") },
@@ -131,7 +134,8 @@ export const DELETE = withAuth<NewsParams>(async (_, { params }) => {
       
       try {
         fs.access(filePath, () => {});
-        fs.unlink(filePath, () => {});
+        fs.unlink(filePath, () => { });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (fileError: any) {
         if (fileError.code === 'ENOENT') {
           console.warn(`Fichier non trouvé: ${filePath}`);

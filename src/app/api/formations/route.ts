@@ -10,6 +10,7 @@ export const GET = withCors(async () => {
     const formations = await prisma.formation.findMany()
     return NextResponse.json(formations)
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }, CORS_CONFIG.public)

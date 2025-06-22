@@ -18,7 +18,6 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { ServiceFormProps } from "./model"
 import { FormChipsInput } from "@/components/ui/form-chips-input"
-import { FormRichTextEditor } from "@/components/ui/form-rich-text-editor"
 import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
@@ -144,6 +143,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
                 <Input
                   type="file"
                   accept="image/*"
+                  {...field}
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 />
               </FormControl>

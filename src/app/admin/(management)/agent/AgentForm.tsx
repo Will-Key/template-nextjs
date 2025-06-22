@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { Role } from "@prisma/client"
+import { Role, User } from "@prisma/client"
 import {
   Select,
   SelectContent,
@@ -97,7 +97,7 @@ export default function AgentForm({
       const method = user ? "PUT" : "POST"
 
       // Pour la modification, ne pas envoyer le mot de passe s'il est vide
-      const payload: any = { ...values }
+      const payload: Partial<User> = { ...values }
       if (user && !values.password?.trim()) {
         delete payload.password
       }

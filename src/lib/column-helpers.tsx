@@ -1,15 +1,14 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table"
+import { Button } from "@/components/ui/button"
+import { MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 
 /**
  * Crée une colonne de base pour une propriété donnée
@@ -18,8 +17,8 @@ export function createColumn<T>(
   accessorKey: keyof T | string,
   header: string,
   options?: {
-    enableSorting?: boolean;
-    enableHiding?: boolean;
+    enableSorting?: boolean
+    enableHiding?: boolean
   }
 ): ColumnDef<T> {
   return {
@@ -27,7 +26,7 @@ export function createColumn<T>(
     header,
     enableSorting: options?.enableSorting ?? true,
     enableHiding: options?.enableHiding ?? true,
-  };
+  }
 }
 
 /**
@@ -37,23 +36,23 @@ export function createCurrencyColumn<T>(
   accessorKey: keyof T | string,
   header: string,
   options?: {
-    currency?: string;
-    locale?: string;
+    currency?: string
+    locale?: string
   }
 ): ColumnDef<T> {
   return {
     accessorKey: accessorKey as string,
     header,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue(accessorKey as string));
+      const amount = parseFloat(row.getValue(accessorKey as string))
       const formatted = new Intl.NumberFormat(options?.locale || "fr-FR", {
         style: "currency",
         currency: options?.currency || "EUR",
-      }).format(amount);
+      }).format(amount)
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="text-right font-medium">{formatted}</div>
     },
-  };
+  }
 }
 
 /**
@@ -63,27 +62,27 @@ export function createDateColumn<T>(
   accessorKey: keyof T | string,
   header: string,
   options?: {
-    dateStyle?: "full" | "long" | "medium" | "short";
-    timeStyle?: "full" | "long" | "medium" | "short";
-    locale?: string;
+    dateStyle?: "full" | "long" | "medium" | "short"
+    timeStyle?: "full" | "long" | "medium" | "short"
+    locale?: string
   }
 ): ColumnDef<T> {
   return {
     accessorKey: accessorKey as string,
     header,
     cell: ({ row }) => {
-      const dateValue = row.getValue(accessorKey as string);
-      if (!dateValue) return null;
+      const dateValue = row.getValue(accessorKey as string)
+      if (!dateValue) return null
 
-      const date = new Date(dateValue as string);
+      const date = new Date(dateValue as string)
       const formatted = new Intl.DateTimeFormat(options?.locale || "fr-FR", {
         dateStyle: options?.dateStyle || "medium",
         timeStyle: options?.timeStyle,
-      }).format(date);
+      }).format(date)
 
-      return <div>{formatted}</div>;
+      return <div>{formatted}</div>
     },
-  };
+  }
 }
 
 /**
@@ -93,26 +92,26 @@ export function createStatusColumn<T>(
   accessorKey: keyof T | string,
   header: string,
   options?: {
-    statuses: Record<string, { color: string; label?: string }>;
+    statuses: Record<string, { color: string; label?: string }>
   }
 ): ColumnDef<T> {
   return {
     accessorKey: accessorKey as string,
     header,
     cell: ({ row }) => {
-      const status = row.getValue(accessorKey as string) as string;
+      const status = row.getValue(accessorKey as string) as string
       const statusConfig = options?.statuses?.[status] || {
         color: "bg-gray-400",
-      };
+      }
 
       return (
         <div className="flex items-center">
           <div className={`mr-2 h-2 w-2 rounded-full ${statusConfig.color}`} />
           <span className="capitalize">{statusConfig.label || status}</span>
         </div>
-      );
+      )
     },
-  };
+  }
 }
 
 /**
@@ -125,35 +124,36 @@ export function createBadgeColumn<T>(
     variantMap?: Record<
       string,
       "default" | "secondary" | "destructive" | "outline"
-    >;
-    maxBadges?: number;
+    >
+    maxBadges?: number
   }
 ): ColumnDef<T> {
   return {
     accessorKey: accessorKey as string,
     header,
     cell: ({ row }) => {
-      const value = row.getValue(accessorKey as string);
-      const items = Array.isArray(value) ? value : [value];
-      const maxBadges = options?.maxBadges || 3;
+      const value = row.getValue(accessorKey as string)
+      const items = Array.isArray(value) ? value : [value]
+      const maxBadges = options?.maxBadges || 3
 
       return (
         <div className="flex flex-wrap gap-1">
           {items.slice(0, maxBadges).map((item: string, index: number) => {
-            const variant = options?.variantMap?.[item] || "default";
+            const variant = options?.variantMap?.[item] || "default"
             return (
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               <Badge key={index} variant={variant as any}>
                 {item}
               </Badge>
-            );
+            )
           })}
           {items.length > maxBadges && (
             <Badge variant="outline">+{items.length - maxBadges}</Badge>
           )}
         </div>
-      );
+      )
     },
-  };
+  }
 }
 
 /**
@@ -161,17 +161,17 @@ export function createBadgeColumn<T>(
  */
 export function createActionsColumn<T>(
   actions: Array<{
-    label: string;
-    icon?: React.ComponentType<{ className?: string }>;
-    onClick?: (data: T) => void;
-    renderButton?: (row: T) => React.ReactNode;
+    label: string
+    icon?: React.ComponentType<{ className?: string }>
+    onClick?: (data: T) => void
+    renderButton?: (row: T) => React.ReactNode
   }>
 ): ColumnDef<T> {
   return {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const data = row.original;
+      const data = row.original
 
       return (
         <DropdownMenu>
@@ -185,14 +185,14 @@ export function createActionsColumn<T>(
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {actions.map((action, i) => {
-              const Icon = action.icon;
+              const Icon = action.icon
               // Si renderButton est fourni, l'utiliser
               if (action.renderButton) {
                 return (
                   <div key={i} className="flex items-center">
                     {action.renderButton(data)}
                   </div>
-                );
+                )
               }
 
               // Sinon, utiliser le rendu par défaut
@@ -206,11 +206,11 @@ export function createActionsColumn<T>(
                   {Icon && <Icon className="h-4 w-4 mr-1" />}
                   {action.label}
                 </Button>
-              );
+              )
             })}
           </DropdownMenuContent>
         </DropdownMenu>
-      );
+      )
     },
-  };
+  }
 }
