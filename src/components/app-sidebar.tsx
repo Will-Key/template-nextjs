@@ -167,10 +167,17 @@ function CollapsibleNavItem({
 }) {
   const shouldBeOpen = isMainItemActive || hasActiveSubItem
 
-  const subItemsActiveStates = allowedSubItems.map((subItem) => ({
-    ...subItem,
-    isActive: useIsActive(subItem.url, false),
-  }))
+  const subItemsActiveStates = React.useMemo(
+    () =>
+      allowedSubItems.map((subItem) => {
+        const isActive = useIsActive(subItem.url, false) // Hook appelé correctement
+        return {
+          ...subItem,
+          isActive,
+        }
+      }),
+    [allowedSubItems]
+  )
 
   return (
     <Collapsible

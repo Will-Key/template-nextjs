@@ -41,17 +41,17 @@ export default function Page() {
     }
   }
 
-  const handleDeleteNews = async (NewsId: string) => {
-    try {
-      await newsServices.delete(NewsId)
-      toast.success("News supprimée avec succès")
-      fetchNews()
-      setRefresh((prev) => prev + 1)
-    } catch (error) {
-      toast.error("Erreur lors de la suppression")
-      console.error(error)
-    }
-  }
+  // const handleDeleteNews = async (NewsId: string) => {
+  //   try {
+  //     await newsServices.delete(NewsId)
+  //     toast.success("News supprimée avec succès")
+  //     fetchNews()
+  //     setRefresh((prev) => prev + 1)
+  //   } catch (error) {
+  //     toast.error("Erreur lors de la suppression")
+  //     console.error(error)
+  //   }
+  // }
 
   // Définition des colonnes en utilisant les helpers
   // const columns = [

@@ -19,6 +19,7 @@ export const GET = withAuth<FormationParams>(async (_, { params }) => {
 
     return NextResponse.json(formation);
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 })

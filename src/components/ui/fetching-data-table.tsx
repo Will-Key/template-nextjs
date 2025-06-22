@@ -44,7 +44,7 @@ export function FetchingDataTable<TData, TValue>({
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [fetchData])
 
   useEffect(() => {
     loadData()
