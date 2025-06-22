@@ -1,7 +1,7 @@
 "use client"
 
 import AppHeader from "@/components/app-header"
-import { News } from "./models"
+
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { newsServices } from "@/lib/api-service"
-import { FetchingDataTable } from "@/components/ui/fetching-data-table"
 import { toast } from "sonner"
 import {
   createActionsColumn,
@@ -22,12 +21,32 @@ import {
 import { Eye, Pencil } from "lucide-react"
 import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog"
 import NewsForm from "./NewsForm"
+import NewsList from "./NewsList"
+import { News } from "@prisma/client"
 
 export default function Page() {
   const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new")
   const [selectedNews, setSelectedNews] = useState<News | null>(null)
   const [open, setOpen] = useState<boolean>(false)
   const [refresh, setRefresh] = useState<number>(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const [news, setNews] = useState<News[]>([])
+
+  const fetchNews = async () => {
+    try {
+      setLoading(true)
+      const data = await newsServices.getAll()
+      setNews(data)
+    } catch (err) {
+      console.error("Error fetching data:", err)
+      setError(
+        err instanceof Error ? err : new Error("Une erreur est survenue")
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleDeleteNews = async (NewsId: string) => {
     try {
@@ -82,16 +101,16 @@ export default function Page() {
     ]),
   ]
 
-  const fetchNews = async () => {
-    return await newsServices.getAll()
-  }
+  // const fetchNews = async () => {
+  //   return await newsServices.getAll()
+  // }
 
   const handleOpenForm = (
-    News: News | null = null,
+    elt: News | null = null,
     formMode: "new" | "edit" | "view"
   ) => {
     setFormMode(formMode)
-    setSelectedNews(News)
+    setSelectedNews(elt)
     setOpen(true)
   }
 
@@ -137,7 +156,7 @@ export default function Page() {
         </Dialog>
       </div>
       <div className="mt-4 p-5">
-        <FetchingDataTable<News, News>
+        {/* <FetchingDataTable<News, News>
           key={refresh}
           columns={columns}
           fetchData={fetchNews}
@@ -145,6 +164,14 @@ export default function Page() {
           searchPlaceholder="Rechercher une actualité"
           emptyMessage="Aucune actualité disponible. Créez votre première actualité en cliquant sur le bouton ci-dessus."
           errorMessage="Impossible de charger les actualités"
+        /> */}
+        <NewsList
+          news={news}
+          onEdit={(elt) => handleOpenForm(elt, "edit")}
+          onSuccess={handleSuccess}
+          loading={loading}
+          error={error}
+          loadData={fetchNews}
         />
       </div>
     </div>

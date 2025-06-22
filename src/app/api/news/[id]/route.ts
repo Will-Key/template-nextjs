@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { withAuth } from "@/lib/middleware"
+import { writeFile } from "fs/promises"
+import path from "path"
 
 const prisma = new PrismaClient();
 
@@ -25,16 +27,93 @@ export const GET = withAuth<NewsParams>(async (_, { params }) => {
 })
 
 export const PUT = withAuth<NewsParams>(async (req, { params }) => {
-  const body = await req.json();
-  const { label, type, description, content, eventDate } = body;
-  const updatedFormation = await prisma.news.update({
-    where: { id: Number(params.id) },
-    data: {
-      label, type, description, content, eventDate
-    },
-  });
-
-  return NextResponse.json(updatedFormation);
+  try {
+    const contentType = req.headers.get("content-type") || ""
+    // Check if it's a multipart request by checking if it starts with multipart/form-data
+    // This is more reliable than using .includes()
+    if (!contentType.includes("multipart/form-data")) {
+      console.log("Content type mismatch. Expected multipart/form-data, got:", contentType)
+      return NextResponse.json(
+        { error: `Content-Type must be multipart/form-data, received: ${contentType}` },
+        { status: 415 }
+      )
+    }
+    
+    try {
+      const contentType = req.headers.get("content-type") || ""
+      
+      if (contentType.includes("application/json")) {
+        // 🔹 Mode JSON simple (sans image)
+        const body = await req.json()
+        const { label, type, description, content, eventDate } = body
+        
+        const news = await prisma.news.create({
+          data: { label, type, description, content, eventDate }
+        })
+  
+        return NextResponse.json(news)
+      }
+  
+      if (contentType.includes("multipart/form-data")) {
+        // 🔹 Mode FormData (avec image)
+        const formData = await req.formData()
+        const label = formData.get("label")?.toString() || ""
+        const type = formData.get("type")?.toString() || ""
+        const description = formData.get("description")?.toString() || ""
+        const eventDate = new Date(formData.get("eventDate")?.toString() || "")
+        const content = formData.get("content")?.toString() || ""
+        const file = formData.get("image") as File | null
+              
+        let imagePath: string | undefined = undefined
+  
+        if (file && file.size > 0) {
+          const bytes = await file.arrayBuffer()
+          const buffer = Buffer.from(bytes)
+          const filename = `${Date.now()}-${file.name}`
+          const filepath = path.join(process.cwd(), "public", "uploads", filename)
+          await writeFile(filepath, buffer)
+          imagePath = `/uploads/${filename}`
+        }
+  
+        if (!label || !type || !description || !eventDate || !file) {
+          return NextResponse.json(
+            { error: "Champs requis manquants" },
+            { status: 400 }
+          )
+        }
+  
+        const updatedService = await prisma.news.update({
+          where: { id: Number(params.id) },
+          data: {
+            label,
+            type,
+            description,
+            content,
+            eventDate,
+            ...(imagePath && { image: imagePath }),
+          },
+        })
+    
+        return NextResponse.json(updatedService)
+      }
+  
+      return NextResponse.json(
+        { error: "Type de contenu non supporté" },
+        { status: 415 }
+      )
+    } catch (formError: any) {
+      return NextResponse.json(
+        { error: "Error processing form data: " + (formError?.message || "Unknown error") },
+        { status: 400 }
+      )
+    }
+  }
+  catch (error: any) {
+    return NextResponse.json(
+      { error: "Erreur lors de la mise à jour: " + (error?.message || "Unknown error") },
+      { status: 500 }
+    );
+  }
 })
 
 export const DELETE = withAuth<NewsParams>(async (_, { params }) => {

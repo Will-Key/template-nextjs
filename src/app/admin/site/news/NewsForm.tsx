@@ -203,6 +203,22 @@ export default function NewsForm({
           placeholder="Ecrivez le contenu ici"
           disabled={mode === "view"}
         />
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image illustrative</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         <div className="flex justify-end gap-2">
           <Button type="submit" disabled={loading}>
             {loading ? "Chargement..." : news?.id ? "Modifier" : "Créer"}
