@@ -8,7 +8,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=ssispro_db # ✅ pour créer automatiquement la base
     ports:
-      - '5432:5432'
+      - '5435:5432'
     volumes:
       - ssispro_db:/var/lib/postgresql/data
     networks:
