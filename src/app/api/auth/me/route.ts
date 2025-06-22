@@ -1,10 +1,11 @@
 // app/api/auth/me/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { withAuthSimple } from '@/lib/middleware'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getMeHandler(user: any) {
   try {
     // Récupérer les informations complètes de l'utilisateur
