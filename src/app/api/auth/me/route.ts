@@ -8,9 +8,10 @@ const prisma = new PrismaClient()
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getMeHandler(user: any) {
   try {
+    console.log(user)
     // Récupérer les informations complètes de l'utilisateur
     const fullUser = await prisma.user.findUnique({
-      where: { id: user?.userId },
+      where: { id: user.userId },
       select: {
         id: true,
         email: true,
