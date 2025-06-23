@@ -24,6 +24,9 @@ RUN corepack enable pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Create empty directories for Docker COPY compatibility
+RUN mkdir -p ./prisma ./node_modules/.pnpm ./node_modules/.bin ./node_modules/tsx ./node_modules/@prisma ./node_modules/prisma
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
@@ -57,24 +60,6 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy package.json
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-
-# Check if project uses Prisma and copy accordingly
-RUN --mount=from=builder,source=/app,target=/tmp/app \
-  if [ -f "/tmp/app/prisma/schema.prisma" ]; then \
-  echo "Prisma detected, copying Prisma files..." && \
-  cp -r /tmp/app/prisma ./prisma && \
-  cp -r /tmp/app/node_modules/.pnpm ./node_modules/.pnpm && \
-  cp -r /tmp/app/node_modules/.bin ./node_modules/.bin && \
-  cp -r /tmp/app/node_modules/tsx ./node_modules/tsx && \
-  cp -r /tmp/app/node_modules/@prisma ./node_modules/@prisma && \
-  cp -r /tmp/app/node_modules/prisma ./node_modules/prisma && \
-  chown -R nextjs:nodejs ./prisma ./node_modules; \
-  else \
-  echo "No Prisma schema found, skipping Prisma setup..."; \
-  fi
-
 USER nextjs
 
 EXPOSE 3000
@@ -83,19 +68,30 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
+# Copy package.json and prisma directory (now guaranteed to exist)
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
 # Enable pnpm in production
 RUN corepack enable pnpm
 
-# Create startup script that handles both Prisma and non-Prisma projects
+# Copy pnpm and required modules (now guaranteed to exist)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.pnpm ./node_modules/.pnpm
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/tsx ./node_modules/tsx
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+
+# Create startup script
 RUN echo '#!/bin/sh' > /app/start.sh && \
   echo 'echo "Starting application..."' >> /app/start.sh && \
   echo 'if [ -f "./prisma/schema.prisma" ]; then' >> /app/start.sh && \
-  echo '  echo "Prisma detected - setting up database..."' >> /app/start.sh && \
+  echo '  echo "Generating Prisma client..."' >> /app/start.sh && \
   echo '  npx prisma generate' >> /app/start.sh && \
+  echo '  echo "Running database migrations..."' >> /app/start.sh && \
   echo '  npx prisma migrate deploy' >> /app/start.sh && \
-  echo '  pnpm run db:seed 2>/dev/null || echo "No seed script found, skipping..."' >> /app/start.sh && \
-  echo 'else' >> /app/start.sh && \
-  echo '  echo "No Prisma schema found, skipping database setup..."' >> /app/start.sh && \
+  echo '  echo "Running database seed..."' >> /app/start.sh && \
+  echo '  pnpm run db:seed || echo "No seed script found, skipping..."' >> /app/start.sh && \
   echo 'fi' >> /app/start.sh && \
   echo 'echo "Starting Next.js server..."' >> /app/start.sh && \
   echo 'exec node server.js' >> /app/start.sh && \
