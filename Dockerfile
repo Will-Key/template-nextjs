@@ -85,7 +85,7 @@ RUN echo '#!/bin/sh' > /app/start.sh && \
   echo '  echo "Running database migrations..."' >> /app/start.sh && \
   echo '  npx prisma migrate deploy' >> /app/start.sh && \
   echo '  echo "Running database seed..."' >> /app/start.sh && \
-  echo '  pnpm run db:seed 2>/dev/null || echo "No seed script found, skipping..."' >> /app/start.sh && \
+  echo '  pnpm run db:seed || echo "Seed failed or no seed script found"' >> /app/start.sh && \
   echo 'fi' >> /app/start.sh && \
   echo 'echo "Starting Next.js server..."' >> /app/start.sh && \
   echo 'exec node server.js' >> /app/start.sh && \
