@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useEffect } from "react"
-import LoginForm from "../../components/auth/LoginForm"
+
 import { useAuth } from "../../lib/auth/AuthContext"
 import { useRouter } from "next/navigation"
+import LoginForm from "@/components/auth/LoginForm"
 
 const LoginPage = () => {
   const { isAuthenticated, loading } = useAuth()

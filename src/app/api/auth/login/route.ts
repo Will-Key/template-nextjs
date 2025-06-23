@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
       user: userWithoutPassword
     });
 
+    console.log('token', token)
     // Définir le cookie avec le token
     response.cookies.set('auth-token', token, {
       httpOnly: true,    // Sécurisé contre XSS
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24, // 1 jour en secondes
       path: '/'
     });
-
+    console.log('response', response)
     return response;
 
   } catch (error) {
