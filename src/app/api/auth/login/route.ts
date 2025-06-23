@@ -59,15 +59,16 @@ export async function POST(request: NextRequest) {
       user: userWithoutPassword
     });
 
+    console.log('token', token)
     // Définir le cookie avec le token
     response.cookies.set('auth-token', token, {
       httpOnly: true,    // Sécurisé contre XSS
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production
+      secure: false, //process.env.NODE_ENV === 'production', // HTTPS en production
       sameSite: 'strict', // Protection CSRF
       maxAge: 60 * 60 * 24, // 1 jour en secondes
       path: '/'
     });
-
+    console.log('response', response)
     return response;
 
   } catch (error) {
