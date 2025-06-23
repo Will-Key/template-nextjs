@@ -62,12 +62,18 @@ export type SimpleAuthenticatedHandler = (
   user: AuthUser
 ) => Promise<NextResponse>
 
-// Middleware principal avec CORS et authentification
+// Type pour les route handlers Next.js
+type NextRouteHandler<T = any> = (
+  req: NextRequest,
+  context: { params: T }
+) => Promise<NextResponse>
+
+// Middleware principal avec CORS et authentification - FIXED
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAuth<T = any>(
   handler: AuthenticatedHandler<T>,
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
-) {
+): NextRouteHandler<T> {
   return async (req: NextRequest, context: { params: T }): Promise<NextResponse> => {
     try {
       // Gérer les requêtes preflight OPTIONS
@@ -94,7 +100,7 @@ export function withAuth<T = any>(
 export function withAuthSimple(
   handler: SimpleAuthenticatedHandler,
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
-) {
+): (req: NextRequest) => Promise<NextResponse> {
   return async (req: NextRequest): Promise<NextResponse> => {
     // Gérer les requêtes preflight OPTIONS
     if (req.method === 'OPTIONS') {
@@ -117,13 +123,13 @@ export function withAuthSimple(
   }
 }
 
-// Middleware avec vérification de rôle et CORS
+// Middleware avec vérification de rôle et CORS - FIXED
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAuthAndRole<T = any>(
   requiredRoles: AuthUser['role'] | AuthUser['role'][],
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
 ) {
-  return function(handler: AuthenticatedHandler<T>) {
+  return function(handler: AuthenticatedHandler<T>): NextRouteHandler<T> {
     return async (req: NextRequest, context: { params: T }): Promise<NextResponse> => {
       // Gérer les requêtes preflight OPTIONS
       if (req.method === 'OPTIONS') {
@@ -158,12 +164,12 @@ export function withAuthAndRole<T = any>(
   }
 }
 
-// Middleware avec vérification de rôle pour routes simples et CORS
+// Middleware avec vérification de rôle pour routes simples et CORS - FIXED
 export function withAuthAndRoleSimple(
   requiredRoles: AuthUser['role'] | AuthUser['role'][],
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
 ) {
-  return function(handler: SimpleAuthenticatedHandler) {
+  return function(handler: SimpleAuthenticatedHandler): (req: NextRequest) => Promise<NextResponse> {
     return async (req: NextRequest): Promise<NextResponse> => {
       // Gérer les requêtes preflight OPTIONS
       if (req.method === 'OPTIONS') {
@@ -198,12 +204,12 @@ export function withAuthAndRoleSimple(
   }
 }
 
-// Middleware pour routes publiques avec CORS uniquement
+// Middleware pour routes publiques avec CORS uniquement - FIXED
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withCors<T = any>(
   handler: (req: NextRequest, context: { params: T }) => Promise<NextResponse>,
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
-) {
+): NextRouteHandler<T> {
   return async (req: NextRequest, context: { params: T }): Promise<NextResponse> => {
     // Gérer les requêtes preflight OPTIONS
     if (req.method === 'OPTIONS') {
@@ -225,11 +231,11 @@ export function withCors<T = any>(
   }
 }
 
-// Middleware pour routes publiques simples avec CORS uniquement
+// Middleware pour routes publiques simples avec CORS uniquement - FIXED
 export function withCorsSimple(
   handler: (req: NextRequest) => Promise<NextResponse>,
   corsOptions: CorsOptions = DEFAULT_CORS_OPTIONS
-) {
+): (req: NextRequest) => Promise<NextResponse> {
   return async (req: NextRequest): Promise<NextResponse> => {
     // Gérer les requêtes preflight OPTIONS
     if (req.method === 'OPTIONS') {
