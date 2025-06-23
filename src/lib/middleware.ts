@@ -49,7 +49,7 @@ function handlePreflight(req: NextRequest, corsOptions: CorsOptions = DEFAULT_CO
   return addCorsHeaders(response, corsOptions)
 }
 
-// Types pour les handlers
+// Types pour les handlers - Updated for Next.js 15 compatibility
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AuthenticatedHandler<T = any> = (
   req: NextRequest,
@@ -62,11 +62,13 @@ export type SimpleAuthenticatedHandler = (
   user: AuthUser
 ) => Promise<NextResponse>
 
-// Type pour les route handlers Next.js
+// Type pour les route handlers Next.js - Compatible avec Next.js 15
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type NextRouteHandler<T = any> = (
   req: NextRequest,
   context: { params: T }
 ) => Promise<NextResponse>
+
 
 // Middleware principal avec CORS et authentification - FIXED
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
