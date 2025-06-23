@@ -1,18 +1,16 @@
 import { withAuth } from "@/lib/middleware"
 import { PrismaClient } from "@prisma/client"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import path from "path"
 import fs from 'fs'
 
 const prisma = new PrismaClient()
 
-interface DocParams {
-  id: string
-}
-
-export const DELETE = withAuth<DocParams>(async (_, { params }) => {
+export const DELETE = withAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async (_req: NextRequest, context: any) => {
   try {
-    const { id } = params;
+    const { id } = context.params;
 
     // Récupérer le document
     const doc = await prisma.docs.findUnique({ 
