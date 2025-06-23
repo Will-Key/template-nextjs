@@ -68,12 +68,12 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
+# Enable pnpm in production (must be done as root before switching users)
+RUN corepack enable pnpm
+
 # Copy package.json and prisma directory (now guaranteed to exist)
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-
-# Enable pnpm in production
-RUN corepack enable pnpm
 
 # Copy pnpm and required modules (now guaranteed to exist)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.pnpm ./node_modules/.pnpm
@@ -91,7 +91,7 @@ RUN echo '#!/bin/sh' > /app/start.sh && \
   echo '  echo "Running database migrations..."' >> /app/start.sh && \
   echo '  npx prisma migrate deploy' >> /app/start.sh && \
   echo '  echo "Running database seed..."' >> /app/start.sh && \
-  echo '  pnpm run db:seed || echo "No seed script found, skipping..."' >> /app/start.sh && \
+  echo '  pnpm run db:seed 2>/dev/null || echo "No seed script found, skipping..."' >> /app/start.sh && \
   echo 'fi' >> /app/start.sh && \
   echo 'echo "Starting Next.js server..."' >> /app/start.sh && \
   echo 'exec node server.js' >> /app/start.sh && \
