@@ -39,7 +39,7 @@ import { useAuth } from "@/lib/auth/AuthContext"
 const data = {
   user: {
     name: "shadcn",
-    email: "m@example.com",
+    personnelNumber: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   teams: [

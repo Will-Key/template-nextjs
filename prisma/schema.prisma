@@ -31,16 +31,16 @@ enum UserStatus {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  email     String     @unique
-  name      String
-  password  String
-  role      Role       @default(agent)
-  status    UserStatus @default(active)
-  lastLogin DateTime?
-  avatar    String?
+  id              String     @id @default(uuid())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  name            String
+  personnelNumber String     @unique @db.VarChar(6)
+  password        String
+  role            Role       @default(agent)
+  status          UserStatus @default(active)
+  lastLogin       DateTime?
+  avatar          String?
 
   // Relation pour l'utilisateur qui a créé cet utilisateur
   createdBy   User?   @relation("UserCreatedBy", fields: [createdById], references: [id])

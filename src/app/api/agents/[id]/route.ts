@@ -27,10 +27,10 @@ export const PUT = withAuth(
   async (req: NextRequest, context: any) => {
     const { id } = context.params;
     const body: User = await req.json();
-    const { name, email, password, role, status } = body;
+    const { name, personnelNumber, password, role, status } = body;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateData: any = { name, email, role, status, createdById: id };
+    const updateData: any = { name, personnelNumber, role, status, createdById: id };
 
     if (password) {
       updateData.password = await bcrypt.hash(password, 10);

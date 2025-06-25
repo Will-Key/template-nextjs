@@ -6,7 +6,7 @@ export interface AuthError extends Error {
 
 export interface JWTPayload {
   userId: string
-  email: string
+  personnelNumber: string
   role?: string
   exp: number
   iat: number
@@ -14,7 +14,7 @@ export interface JWTPayload {
 
 export interface AuthUser {
   userId: string
-  email: string
+  personnelNumber: string
   role: Role
   name?: string
 }

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user.id,
-        email: user.email,
+        personnelNumber: user.personnelNumber,
         name: user.name,
         role: user.role
       }

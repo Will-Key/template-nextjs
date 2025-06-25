@@ -45,7 +45,7 @@ export default function Page() {
   const columns = [
     createColumn<User>("name", "Nom complet"),
 
-    createColumn<User>("email", "Email"),
+    createColumn<User>("personnelNumber", "Matricule"),
 
     createDateColumn<User>("createdAt", "Date de création", {
       dateStyle: "medium",

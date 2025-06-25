@@ -9,10 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    const { personnelNumber, password } = await request.json();
 
     // Validation des champs
-    if (!email || !password) {
+    if (!personnelNumber || !password) {
       return NextResponse.json(
         { error: 'Email et mot de passe requis' },
         { status: 400 }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Rechercher l'utilisateur
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({ where: { personnelNumber } })
     if (!user) {
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign(
       { 
         userId: user.id,
-        email: user.email,
+        personnelNumber: user.personnelNumber,
         role: user.role
       },
       JWT_SECRET,
