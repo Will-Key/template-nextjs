@@ -15,7 +15,7 @@ export const GET = withAuthSimple(async() => {
       },
       select: {
         id: true,
-        email: true,
+        personnelNumber: true,
         name: true,
         role: true,
         createdAt: true,
@@ -34,12 +34,12 @@ export const GET = withAuthSimple(async() => {
 export const POST = withAuth(async (req, _, { userId }) => {
   try {    
     const body: User = await req.json();
-    const { name, email, password, role, status } = body;
+    const { name, personnelNumber, password, role, status } = body;
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword, role, status, createdById: userId },
+      data: { name, personnelNumber, password: hashedPassword, role, status, createdById: userId },
     });
 
     return NextResponse.json(user);

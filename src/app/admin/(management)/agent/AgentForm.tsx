@@ -29,8 +29,8 @@ const userSchema = z.object({
   name: z.string().min(3, {
     message: "Le nom doit être au moins 3 caractères",
   }),
-  email: z.string().email({
-    message: "Veuillez entrer un email valide",
+  personnelNumber: z.string().min(6).max(6, {
+    message: "Veuillez entrer un matricule de six caractères",
   }),
   password: z
     .string()
@@ -64,7 +64,7 @@ export default function AgentForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
       name: "",
-      email: "",
+      personnelNumber: "",
       password: "",
       role: "agent",
       status: "active",
@@ -76,7 +76,7 @@ export default function AgentForm({
     if (user) {
       form.reset({
         name: user.name || "",
-        email: user.email || "",
+        personnelNumber: user.personnelNumber || "",
         password: "", // Ne pas pré-remplir le mot de passe pour la sécurité
         role:
           user.role === Role.super_admin
@@ -152,14 +152,14 @@ export default function AgentForm({
 
         <FormField
           control={form.control}
-          name="email"
+          name="personnelNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Matricule</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
-                  placeholder="exemple@email.com"
+                  type="personnelNumber"
+                  placeholder="Entrer le matricule"
                   disabled={mode === "view"}
                   {...field}
                 />

@@ -29,21 +29,21 @@ async function seedUsers() {
   console.log('👥 Création des utilisateurs...')
   
   const existingAdmin = await prisma.user.findUnique({
-    where: { email: 'super@admin.com' }
+    where: { personnelNumber: 'super@admin.com' }
   })
   
-  if (!existingAdmin) {
+  if (existingAdmin) {
+    console.log('ℹ️ Admin existe déjà')
+  } else {
     await prisma.user.create({
       data: {
-        email: 'super@admin.com',
+        personnelNumber: 'KPDIEM',
         name: 'Super Admin',
         password: await bcrypt.hash('Azertyuiop123', 10),
         role: 'super_admin'
       }
     })
     console.log('✅ Admin créé')
-  } else {
-    console.log('ℹ️ Admin existe déjà')
   }
   
 }

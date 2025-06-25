@@ -85,7 +85,7 @@ export const FormationsPage = withDataTable<Formation>({
 //   service: usersService,
 //   columns: [
 //     createColumn<User>("name", "Nom"),
-//     createColumn<User>("email", "Email"),
+//     createColumn<User>("personnelNumber", "Matricule"),
 //     createBadgeColumn<User>("role", "Rôle", {
 //       variantMap: {
 //         admin: "destructive",

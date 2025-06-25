@@ -2,19 +2,19 @@
 import { NextResponse } from 'next/server'
 import { withAuthSimple } from '@/lib/middleware'
 import { PrismaClient } from '@prisma/client'
+import { AuthUser } from '@/lib/types/auth'
 
 const prisma = new PrismaClient()
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getMeHandler(user: any) {
+async function getMeHandler(_: any, user: AuthUser) {
   try {
-    console.log(user)
     // Récupérer les informations complètes de l'utilisateur
     const fullUser = await prisma.user.findUnique({
       where: { id: user.userId },
       select: {
         id: true,
-        email: true,
+        personnelNumber: true,
         name: true,
         role: true,
         // Exclure le password

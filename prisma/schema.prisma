@@ -36,7 +36,7 @@ model User {
   updatedAt       DateTime   @updatedAt
   name            String
   personnelNumber String     @unique @db.VarChar(6)
-  password        String     @db.VarChar(8)
+  password        String
   role            Role       @default(agent)
   status          UserStatus @default(active)
   lastLogin       DateTime?

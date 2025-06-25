@@ -7,7 +7,7 @@ import { User } from "@prisma/client"
 
 interface AuthContextType {
   user: User | null
-  login: (email: string, password: string) => Promise<boolean>
+  login: (personnelNumber: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   loading: boolean
   isAuthenticated: boolean
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (personnelNumber: string, password: string): Promise<boolean> => {
     try {
       setLoading(true)
 
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ personnelNumber, password }),
         credentials: "include", // Important pour recevoir les cookies
       })
 

@@ -7,7 +7,7 @@ import Image from "next/image"
 import { Lock, Mail } from "lucide-react"
 
 const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState("")
+  const [personnelNumber, setPersonnelNumber] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -32,7 +32,7 @@ const LoginForm: React.FC = () => {
       console.log("Début de la soumission du formulaire")
 
       try {
-        const success = await login(email, password)
+        const success = await login(personnelNumber, password)
         console.log("Résultat du login:", success)
 
         if (success) {
@@ -62,7 +62,7 @@ const LoginForm: React.FC = () => {
       }
       // Ne pas mettre finally ici pour éviter de réinitialiser loading prématurément
     },
-    [email, password, login, router, loading, isSubmitted]
+    [personnelNumber, password, login, router, loading, isSubmitted]
   )
 
   // Debug pour voir les re-renders
@@ -110,24 +110,24 @@ const LoginForm: React.FC = () => {
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="sr-only">
-                    Adresse email
+                  <label htmlFor="personnelNumber" className="sr-only">
+                    Matricule
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="text-gray-400 dark:text-gray-500 h-5 w-5" />
                     </div>
                     <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
+                      id="personnelNumber"
+                      name="personnelNumber"
+                      type="text"
+                      autoComplete="text"
                       required
                       disabled={loading}
                       className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
-                      placeholder="Adresse email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Numéro matricule"
+                      value={personnelNumber}
+                      onChange={(e) => setPersonnelNumber(e.target.value)}
                     />
                   </div>
                 </div>
