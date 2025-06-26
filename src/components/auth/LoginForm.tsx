@@ -94,8 +94,8 @@ const LoginForm: React.FC = () => {
               <Image
                 src="/images/logoss.png"
                 alt="SSISPRO Logo"
-                width={20}
-                height={20}
+                width={70}
+                height={70}
                 className="mx-auto h-20 w-auto mb-4"
               />
             </div>
