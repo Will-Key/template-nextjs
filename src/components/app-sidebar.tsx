@@ -38,14 +38,14 @@ import { useAuth } from "@/lib/auth/AuthContext"
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
+    name: "ssispro",
     personnelNumber: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/images/logoss.png",
   },
   teams: [
     {
       name: "SSISPRO",
-      logo: Command,
+      logo: "/images/logoss.png",
       plan: "Free",
     },
   ],
