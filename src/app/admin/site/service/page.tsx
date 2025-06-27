@@ -1,55 +1,55 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import AppHeader from "@/components/app-header"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import AppHeader from "@/components/app-header";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { ServiceForm } from "./ServiceForm"
-import { Service } from "./model"
-import DataList from "@/components/ui/data-list"
+} from "@/components/ui/dialog";
+import { ServiceForm } from "./ServiceForm";
+import { Service } from "./model";
+import DataList from "@/components/ui/data-list";
 
 export default function Page() {
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null)
-  const [services, setServices] = useState<Service[]>([])
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
 
   const fetchServices = async () => {
     try {
-      setLoading(true)
-      const res = await fetch("/api/services")
-      const data = await res.json()
-      setServices(data)
+      setLoading(true);
+      const res = await fetch("/api/services");
+      const data = await res.json();
+      setServices(data);
     } catch (err) {
-      console.error("Error fetching data:", err)
+      console.error("Error fetching data:", err);
       setError(
         err instanceof Error ? err : new Error("Une erreur est survenue")
-      )
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleOpenForm = (service: Service | null = null) => {
-    setServiceToEdit(service)
-    setOpen(true)
-  }
+    setServiceToEdit(service);
+    setOpen(true);
+  };
 
   const handleSuccess = () => {
-    setOpen(false)
-    fetchServices()
-  }
+    setOpen(false);
+    fetchServices();
+  };
 
   useEffect(() => {
-    fetchServices()
-  }, [])
+    fetchServices();
+  }, []);
 
   return (
     <div>
@@ -94,6 +94,11 @@ export default function Page() {
         titleField="label" // Utilise "label" au lieu de "title"
         config={{
           messages: {
+            loading: "Chargement des données...",
+            error: "Une erreur est survenue lors du chargement des données",
+            empty: "Aucune donnée disponible",
+            retryButton: "Réessayer",
+            refreshButton: "Actualiser",
             editButton: "Modifier",
             deleteButton: "Supprimer",
             deleteSuccess: "Actualité supprimé avec succès !",
@@ -107,5 +112,5 @@ export default function Page() {
         }}
       />
     </div>
-  )
+  );
 }

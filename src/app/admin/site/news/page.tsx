@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import AppHeader from "@/components/app-header"
+import AppHeader from "@/components/app-header";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { newsServices } from "@/lib/api-service"
-import NewsForm from "./NewsForm"
-import { News } from "@prisma/client"
-import DataList from "@/components/ui/data-list"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { newsServices } from "@/lib/api-service";
+import NewsForm from "./NewsForm";
+import { News } from "@prisma/client";
+import DataList from "@/components/ui/data-list";
 
 export default function Page() {
-  const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new")
-  const [selectedNews, setSelectedNews] = useState<News | null>(null)
-  const [open, setOpen] = useState<boolean>(false)
-  const [refresh, setRefresh] = useState<number>(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const [news, setNews] = useState<News[]>([])
+  const [formMode, setFormMode] = useState<"new" | "edit" | "view">("new");
+  const [selectedNews, setSelectedNews] = useState<News | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [news, setNews] = useState<News[]>([]);
 
   const fetchNews = async () => {
     try {
-      setLoading(true)
-      const data = await newsServices.getAll()
-      setNews(data)
+      setLoading(true);
+      const data = await newsServices.getAll();
+      setNews(data);
     } catch (err) {
-      console.error("Error fetching data:", err)
+      console.error("Error fetching data:", err);
       setError(
         err instanceof Error ? err : new Error("Une erreur est survenue")
-      )
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // const handleDeleteNews = async (NewsId: string) => {
   //   try {
@@ -102,20 +102,20 @@ export default function Page() {
     elt: News | null = null,
     formMode: "new" | "edit" | "view"
   ) => {
-    setFormMode(formMode)
-    setSelectedNews(elt)
-    setOpen(true)
-  }
+    setFormMode(formMode);
+    setSelectedNews(elt);
+    setOpen(true);
+  };
 
   const handleSuccess = () => {
-    setOpen(false)
-    fetchNews()
-    setRefresh(refresh + 1)
-  }
+    setOpen(false);
+    fetchNews();
+    setRefresh(refresh + 1);
+  };
 
   useEffect(() => {
-    fetchNews()
-  }, [])
+    fetchNews();
+  }, []);
 
   return (
     <div>
@@ -175,6 +175,11 @@ export default function Page() {
         titleField="label" // Utilise "label" au lieu de "title"
         config={{
           messages: {
+            loading: "Chargement des données...",
+            error: "Une erreur est survenue lors du chargement des données",
+            empty: "Aucune donnée disponible",
+            retryButton: "Réessayer",
+            refreshButton: "Actualiser",
             editButton: "Modifier",
             deleteButton: "Supprimer",
             deleteSuccess: "Actualité supprimé avec succès !",
@@ -188,5 +193,5 @@ export default function Page() {
         }}
       />
     </div>
-  )
+  );
 }
