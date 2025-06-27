@@ -5,7 +5,6 @@ import { NextRequest } from 'next/server'
 
 export async function verifyAuth(request: NextRequest): Promise<JWTPayload> {
   let token: string | null = null;
-  console.log('verifyAuth', request)
   // 1. Chercher d'abord dans le header Authorization
   const authHeader = request.headers.get('Authorization')
   if (authHeader && authHeader.startsWith('Bearer ')) {

@@ -1,6 +1,6 @@
 services:
   ssispro_db:
-    image: postgres:15
+    image: postgres:17
     container_name: ssispro_db
     restart: always
     environment:
@@ -20,26 +20,26 @@ services:
       retries: 5
 
   # Application NextJS
-  ssispro_app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ssispro_app
-    restart: always
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@ssispro_db:5432/ssispro_db
-      - JWT_SECRET="azertyuiopmlkjhgfdsqqwxcvbn"
-      # Ajoutez ici vos autres variables d'environnement
-      # - NEXTAUTH_SECRET=your-secret-key
-      # - NEXTAUTH_URL=http://localhost:3000
-    depends_on:
-      ssispro_db:
-        condition: service_healthy
-    networks:
-      - ssispro_net
+  # ssispro_app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: ssispro_app
+  #   restart: always
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     - NODE_ENV=production
+  #     - DATABASE_URL=postgresql://postgres:postgres@ssispro_db:5432/ssispro_db
+  #     - JWT_SECRET="azertyuiopmlkjhgfdsqqwxcvbn"
+  #     # Ajoutez ici vos autres variables d'environnement
+  #     # - NEXTAUTH_SECRET=your-secret-key
+  #     # - NEXTAUTH_URL=http://localhost:3000
+  #   depends_on:
+  #     ssispro_db:
+  #       condition: service_healthy
+  #   networks:
+  #     - ssispro_net
 
 volumes:
   ssispro_db:
