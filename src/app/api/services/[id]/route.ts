@@ -30,7 +30,7 @@ export const GET = withAuth(
 export const PUT = withAuth(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (req: NextRequest, context: any) => {
-    const { id } = context.params;
+    const { id } = await context.params;
     try {
       const contentType = req.headers.get("content-type") || "";    
       // Check if it's a multipart request by checking if it starts with multipart/form-data
