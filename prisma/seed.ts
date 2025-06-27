@@ -10,7 +10,7 @@ async function main() {
   await prisma.formation.deleteMany()
   await prisma.service.deleteMany()
   await prisma.news.deleteMany()
-  //await prisma.user.deleteMany()
+  await prisma.user.deleteMany()
   
   // Création des utilisateurs
   await seedUsers()
