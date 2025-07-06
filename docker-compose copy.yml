@@ -12,7 +12,7 @@ services:
     volumes:
       - ssispro_db:/var/lib/postgresql/data
     networks:
-      - dokploy-network
+      - ssispro_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -32,7 +32,6 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:postgres@ssispro_db:5432/ssispro_db
       - JWT_SECRET="azertyuiopmlkjhgfdsqqwxcvbn"
-      - PORT=3000
       # Ajoutez ici vos autres variables d'environnement
       # - NEXTAUTH_SECRET=your-secret-key
       # - NEXTAUTH_URL=http://localhost:3000
@@ -40,18 +39,12 @@ services:
       ssispro_db:
         condition: service_healthy
     networks:
-      - dokploy-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.flowiseai.rule=Host(`flowise.domain.com`)"
-      - "traefik.http.routers.flowiseai.entrypoints=websecure"
-      - "traefik.http.routers.flowiseai.tls.certResolver=letsencrypt"
-      - "traefik.http.services.flowiseai.loadbalancer.server.port=3000"
+      - ssispro_net
 
 volumes:
   ssispro_db:
     driver: local
 
 networks:
-  dokploy-network:
-    external: true
+  ssispro_net:
+    driver: bridge
