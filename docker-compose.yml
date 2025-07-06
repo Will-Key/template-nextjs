@@ -27,12 +27,12 @@ services:
     container_name: ssispro_app
     restart: always
     ports:
-      - '3000:3000'
+      - '3001:3001'
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:postgres@ssispro_db:5432/ssispro_db
       - JWT_SECRET="azertyuiopmlkjhgfdsqqwxcvbn"
-      - PORT=3000
+      - PORT=3001
       # Ajoutez ici vos autres variables d'environnement
       # - NEXTAUTH_SECRET=your-secret-key
       # - NEXTAUTH_URL=http://localhost:3000
