@@ -14,4 +14,6 @@ export interface NewsListProps {
   onEdit: (service: News) => void
   onSuccess?: () => void
   loadData: () => void
+  emptyMessage: string
+  errorMessage: string
 }
