@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import path from "path";
-import { writeFile } from "fs/promises";
 import { withAuth, withCors } from "@/lib/middleware"
+import { v2 as cloudinary } from 'cloudinary'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
+
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export const GET = withCors(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,97 +33,100 @@ export const GET = withCors(
   }
 )
 
-export const PUT = withAuth(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async (req: NextRequest, context: any) => {
-    const { id } = await context.params;
-    try {
-      const contentType = req.headers.get("content-type") || "";    
-      // Check if it's a multipart request by checking if it starts with multipart/form-data
-      // This is more reliable than using .includes()
-      if (!contentType.includes("multipart/form-data")) {
-        console.log("Content type mismatch. Expected multipart/form-data, got:", contentType);
-        return NextResponse.json(
-          { error: `Content-Type must be multipart/form-data, received: ${contentType}` },
-          { status: 415 }
-        );
-      }
-      
-      try {
-        const formData = await req.formData();
-        
-        const label = formData.get("label")?.toString() || "";
-        const description = formData.get("description")?.toString() || "";
-        
-        // Handle content array properly
-        let content: string[] = [];
-        const contentValue = formData.get("content");
-        
-        if (contentValue) {
-          if (typeof contentValue === "string") {
-            content = contentValue.split(',').filter(item => item.trim() !== "");
-          } else if (Array.isArray(contentValue)) {
-            content = contentValue.map(item => item.toString());
-          }
-        }
-              
-        // Handle image file
-        const file = formData.get("image") as File | null;
-        
-        let imagePath: string | undefined = undefined;
+export const PUT = withAuth(async (req: NextRequest, context: any) => {
+  const { id } = context.params;
 
-        if (file && file.size > 0) {
-          const bytes = await file.arrayBuffer();
-          const buffer = Buffer.from(bytes);
-          const filename = `${Date.now()}-${file.name}`;
-          const filepath = path.join(process.cwd(), "public", "uploads", filename);
-          await writeFile(filepath, buffer);
-          imagePath = `/uploads/${filename}`;
-        }
-        
-        // Update the service in the database
-        const updatedService = await prisma.service.update({
-          where: { id: Number(id) },
-          data: {
-            label,
-            description,
-            content,
-            ...(imagePath && { image: imagePath }),
-          },
-        });
-
-        return NextResponse.json(updatedService);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (formError: any) {
-        return NextResponse.json(
-          { error: "Error processing form data: " + (formError?.message || "Unknown error") },
-          { status: 400 }
-        );
-      }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+  try {
+    const contentType = req.headers.get("content-type") || "";
+    if (!contentType.includes("multipart/form-data")) {
       return NextResponse.json(
-        { error: "Erreur lors de la mise à jour: " + (error?.message || "Unknown error") },
-        { status: 500 }
+        { error: `Content-Type must be multipart/form-data, reçu : ${contentType}` },
+        { status: 415 }
       );
     }
-  }
-)
 
-export const DELETE = withAuth(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async (_req: NextRequest, context: any) => {
-  const { id } = context.params;
-    try {
-      console.log(_req.json())
-      const service = await prisma.service.delete({
-        where: { id: Number(id) },
-      });
+    const formData = await req.formData();
+    const label = formData.get("label")?.toString() || "";
+    const description = formData.get("description")?.toString() || "";
 
-      return NextResponse.json({ message: "Service supprimé", service });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      return NextResponse.json({ error: "Erreur suppression" + (error?.message || "Unknown error")}, { status: 500 });
+    let content: string[] = [];
+    const contentValue = formData.get("content");
+    if (contentValue) {
+      if (typeof contentValue === "string") {
+        content = contentValue.split(',').filter(item => item.trim() !== "");
+      } else if (Array.isArray(contentValue)) {
+        content = contentValue.map(item => item.toString());
+      }
     }
+
+    const file = formData.get("image") as File | null;
+
+    let imageUrl: string | undefined = undefined;
+    let publicId: string | undefined = undefined;
+
+    if (file && file.size > 0) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+     const uploadToCloudinary = async (buffer: Buffer): Promise<{secure_url: string, public_id: string}> => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "services" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve({secure_url: result?.secure_url || "", public_id: result?.public_id || ""});
+            }
+          );
+          stream.end(buffer);
+        });
+      };
+
+      imageUrl = (await uploadToCloudinary(buffer)).secure_url;
+      publicId = (await uploadToCloudinary(buffer)).public_id;
+
+      // 🔁 Supprimer ancienne image si présente
+      const previous = await prisma.service.findUnique({ where: { id: Number(id) } });
+      if (previous?.imagePublicId) {
+        await cloudinary.uploader.destroy(previous.imagePublicId);
+      }
+    }
+
+    const updatedService = await prisma.service.update({
+      where: { id: Number(id) },
+      data: {
+        label,
+        description,
+        content,
+        ...(imageUrl && { image: imageUrl }),
+        ...(publicId && { imagePublicId: publicId }),
+      },
+    });
+
+    return NextResponse.json(updatedService);
+
+  } catch (error: any) {
+    return NextResponse.json({ error: "Erreur mise à jour : " + error.message }, { status: 500 });
   }
-)
+});
+
+export const DELETE = withAuth(async (_req: NextRequest, context: any) => {
+  const { id } = context.params;
+
+  try {
+    const service = await prisma.service.findUnique({ where: { id: Number(id) } });
+
+    if (!service) {
+      return NextResponse.json({ error: "Service introuvable" }, { status: 404 });
+    }
+
+    if (service.imagePublicId) {
+      await cloudinary.uploader.destroy(service.imagePublicId);
+    }
+
+    await prisma.service.delete({ where: { id: Number(id) } });
+
+    return NextResponse.json({ message: "Service supprimé", service });
+
+  } catch (error: any) {
+    return NextResponse.json({ error: "Erreur suppression : " + error.message }, { status: 500 });
+  }
+});

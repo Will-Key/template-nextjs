@@ -57,15 +57,16 @@ model User {
 }
 
 model Service {
-  id          Int      @id @default(autoincrement())
-  label       String
-  description String
-  image       String?
-  content     String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
+  id            Int      @id @default(autoincrement())
+  label         String
+  description   String
+  image         String?
+  imagePublicId String?
+  content       String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     User?    @relation(fields: [createdById], references: [id])
+  createdById   String?
 }
 
 model Formation {
@@ -84,17 +85,18 @@ model Formation {
 }
 
 model News {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  label       String
-  type        String   @db.VarChar(30)
-  description String   @db.VarChar(150)
-  content     String
-  eventDate   DateTime
-  image       String?
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  label         String
+  type          String   @db.VarChar(30)
+  description   String   @db.VarChar(150)
+  content       String
+  eventDate     DateTime
+  image         String?
+  imagePublicId String?
+  createdBy     User?    @relation(fields: [createdById], references: [id])
+  createdById   String?
 }
 
 model Docs {

@@ -1,10 +1,15 @@
 import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
-import { writeFile } from "fs/promises";
-import path from "path";
 import { CORS_CONFIG, withAuth, withCors } from '@/lib/middleware'
+import { v2 as cloudinary} from 'cloudinary'
 
 const prisma = new PrismaClient()
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export const GET = withCors(async () => {
   try {
@@ -17,12 +22,10 @@ export const GET = withCors(async () => {
 }, CORS_CONFIG.public)
 
 export const POST = withAuth(async (req: Request) => {
-  
   try {
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("application/json")) {
-      // 🔹 Mode JSON simple (sans image)
       const body = await req.json();
       const { label, description, content } = body;
 
@@ -34,47 +37,54 @@ export const POST = withAuth(async (req: Request) => {
     }
 
     if (contentType.includes("multipart/form-data")) {
-      // 🔹 Mode FormData (avec image)
       const formData = await req.formData();
       const label = formData.get("label")?.toString() || "";
       const description = formData.get("description")?.toString() || "";
       const content = formData.get("content")?.toString().split(',') || [];
       const file = formData.get("image") as File | null;
 
+      let imageUrl: string | undefined = undefined
+      let publicId: string | undefined = undefined
+
       if (!label || !description || !file) {
-        return NextResponse.json(
-          { error: "Champs requis manquants" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 });
       }
 
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filename = `${Date.now()}-${file.name}`;
-      const filepath = path.join(process.cwd(), "public", "uploads", filename);
-      await writeFile(filepath, buffer);
+      const buffer = Buffer.from(await file.arrayBuffer())
+
+      const uploadToCloudinary = async (buffer: Buffer): Promise<{secure_url: string, public_id: string}> => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "services" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve({secure_url: result?.secure_url || "", public_id: result?.public_id || ""});
+            }
+          );
+          stream.end(buffer);
+        });
+      };
+
+      imageUrl = (await uploadToCloudinary(buffer)).secure_url;
+      publicId = (await uploadToCloudinary(buffer)).public_id
 
       const service = await prisma.service.create({
         data: {
           label,
           description,
           content,
-          image: `/uploads/${filename}`,
+          image: imageUrl,
+          imagePublicId: publicId,
         },
       });
 
       return NextResponse.json(service, { status: 201 });
     }
 
-    return NextResponse.json(
-      { error: "Type de contenu non supporté" },
-      { status: 415 }
-    );
+    return NextResponse.json({ error: "Type de contenu non supporté" }, { status: 415 });
+
   } catch (error) {
     console.error("POST error:", error);
-    return NextResponse.json(
-      { error: "Erreur lors de la création" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 });
   }
-})
+});
