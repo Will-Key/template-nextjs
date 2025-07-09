@@ -103,8 +103,8 @@ export const PUT = withAuth(async (req: NextRequest, context: any) => {
 
     return NextResponse.json(updatedService);
 
-  } catch (error: any) {
-    return NextResponse.json({ error: "Erreur mise à jour : " + error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: "Erreur mise à jour : " }, { status: 500 });
   }
 });
 
@@ -126,7 +126,7 @@ export const DELETE = withAuth(async (_req: NextRequest, context: any) => {
 
     return NextResponse.json({ message: "Service supprimé", service });
 
-  } catch (error: any) {
-    return NextResponse.json({ error: "Erreur suppression : " + error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: "Erreur suppression : " }, { status: 500 });
   }
 });
