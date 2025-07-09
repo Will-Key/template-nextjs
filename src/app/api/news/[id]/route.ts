@@ -2,7 +2,6 @@ import {  NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { withAuth, withCors } from "@/lib/middleware"
 import { v2 as cloudinary} from 'cloudinary'
-import fs from 'fs'
 
 const prisma = new PrismaClient();
 
@@ -96,9 +95,9 @@ export const PUT = withAuth(async (req: NextRequest, context: any) => {
 
     return NextResponse.json(updatedNews);
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: "Erreur lors de la mise à jour: " + (error?.message || "Unknown error") },
+      { error: "Erreur lors de la mise à jour: " },
       { status: 500 }
     );
   }

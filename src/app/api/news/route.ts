@@ -84,7 +84,7 @@ export const POST = withAuth(async (req) => {
 
     return NextResponse.json({ error: "Type de contenu non supporté" }, { status: 415 })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("POST error:", error)
     return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 })
   }
