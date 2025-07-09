@@ -7,9 +7,9 @@ const prisma = new PrismaClient()
 
 // Cloudinary config
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "dfsuc89b6",
+  api_key: process.env.CLOUDINARY_API_KEY || "375989313918528",
+  api_secret: process.env.CLOUDINARY_API_SECRET || "tbmD83oV0aMnZnEM65eAK3AEB0Y",
 })
 
 export const GET = withCors(
