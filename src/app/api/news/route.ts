@@ -5,6 +5,12 @@ import { v2 as cloudinary} from 'cloudinary'
 
 const prisma = new PrismaClient()
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "dfsuc89b6",
+  api_key: process.env.CLOUDINARY_API_KEY || "375989313918528",
+  api_secret: process.env.CLOUDINARY_API_SECRET || "tbmD83oV0aMnZnEM65eAK3AEB0Y",
+})
+
 export const GET = withCors(async() => {
   try {
     const news = await prisma.news.findMany()
