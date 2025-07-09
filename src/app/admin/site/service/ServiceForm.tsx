@@ -19,6 +19,7 @@ import { z } from "zod"
 import { ServiceFormProps } from "./model"
 import { FormChipsInput } from "@/components/ui/form-chips-input"
 import { Textarea } from "@/components/ui/textarea"
+import Image from "next/image"
 
 const formSchema = z.object({
   label: z.string().min(3, {
@@ -150,7 +151,9 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
               {service?.image && (
                 <div className="mt-2">
                   <p className="text-sm text-muted-foreground">Image actuelle :</p>
-                  <img
+                  <Image
+                    width={100}
+                    height={100}
                     src={service.image}
                     alt="Image actuelle"
                     className="mt-1 max-h-20 rounded border"

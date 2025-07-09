@@ -96,6 +96,7 @@ export const PUT = withAuth(async (req: NextRequest, context: any) => {
     return NextResponse.json(updatedNews);
 
   } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'actualité:", error);
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour: " },
       { status: 500 }
