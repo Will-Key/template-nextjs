@@ -13,7 +13,15 @@ const nextConfig: NextConfig = {
   
   // Si vous utilisez des images
   images: {
-    domains: ['localhost'],
+    //domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/dfsuc89b6/image/upload/**', // adapte à ton cloud_name
+      },
+    ],
+  
     // Ajoutez d'autres domaines si nécessaire
   },
 };

@@ -62,7 +62,7 @@ export default function Page() {
               Créer un service
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[550px]">
+          <DialogContent className="sm:max-w-[660px] max-h-[660px] overflow-auto">
             <DialogHeader>
               <DialogTitle>
                 {serviceToEdit ? "Modifier" : "Créer"} un service
@@ -105,9 +105,11 @@ export default function Page() {
             deleteError: "Erreur lors de la suppression !",
             deleteConfirmDescription:
               "Voulez-vous vraiment supprimer ce service ? Cette action est irréversible.",
+            confirmButton: "Supprimer",
+            cancelButton: "Annuler",
           },
           api: {
-            deleteEndpoint: (id) => `/api/news/${id}`,
+            deleteEndpoint: (id) => `/api/services/${id}`,
           },
         }}
       />

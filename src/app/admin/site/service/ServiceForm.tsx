@@ -51,7 +51,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
         label: service.label,
         description: service.description,
         content: service.content,
-        image: service.image,
+        image: undefined, // Ne pas précharger l'image pour éviter les problèmes de type
       })
     }
   }, [service, form])
@@ -92,7 +92,7 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 overflow-auto">
         <FormField
           control={form.control}
           name="label"
@@ -147,6 +147,16 @@ export function ServiceForm({ service, onClose, onSuccess }: ServiceFormProps) {
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 />
               </FormControl>
+              {service?.image && (
+                <div className="mt-2">
+                  <p className="text-sm text-muted-foreground">Image actuelle :</p>
+                  <img
+                    src={service.image}
+                    alt="Image actuelle"
+                    className="mt-1 max-h-20 rounded border"
+                  />
+                </div>
+              )}
             </FormItem>
           )}
         />
