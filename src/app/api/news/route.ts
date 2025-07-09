@@ -83,9 +83,9 @@ export const POST = withAuth(async (req) => {
     }
 
     return NextResponse.json({ error: "Type de contenu non supporté" }, { status: 415 })
-
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error("POST error:", error)
-    return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 })
+    return NextResponse.json({ error: "Erreur lors de la création: " + error?.message }, { status: 500 })
   }
 })

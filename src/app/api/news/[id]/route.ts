@@ -96,10 +96,11 @@ export const PUT = withAuth(async (req: NextRequest, context: any) => {
 
     return NextResponse.json(updatedNews);
 
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.error("Erreur lors de la mise à jour de l'actualité:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la mise à jour: " },
+      { error: "Erreur lors de la mise à jour: " + error?.message },
       { status: 500 }
     );
   }
@@ -126,9 +127,9 @@ export const DELETE = withAuth(async (_req: NextRequest, context: any) => {
     await prisma.news.delete({ where: { id: Number(id) } });
 
     return NextResponse.json({ message: "Actualité supprimée avec succès", news });
-
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     console.log(error);
-    return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500 });
+    return NextResponse.json({ error: "Erreur lors de la suppression " + error?.message }, { status: 500 });
   }
 });
