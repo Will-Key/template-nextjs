@@ -26,6 +26,7 @@ export const GET = withCors(
   }
 )
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const PUT = withAuth(async (req: NextRequest, context: any) => {
   const { id } = context.params;
 
@@ -104,6 +105,7 @@ export const PUT = withAuth(async (req: NextRequest, context: any) => {
   }
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const DELETE = withAuth(async (_req: NextRequest, context: any) => {
   const { id } = context.params;
 
