@@ -1,25 +1,32 @@
+version: "3.9"
+
 services:
+  # --------------------------
+  # Base de données Postgres
+  # --------------------------
   ssispro_db:
     image: postgres:15
     container_name: ssispro_db
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ssispro_db # ✅ pour créer automatiquement la base
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=ssispro_db # fixé en dur
     ports:
-      - '5435:5432'
+      - "5435:5432"
     volumes:
       - ssispro_db:/var/lib/postgresql/data
     networks:
       - dokploy-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # --------------------------
   # Application NextJS
+  # --------------------------
   ssispro_app:
     build:
       context: .
@@ -27,15 +34,18 @@ services:
     container_name: ssispro_app
     restart: always
     ports:
-      - '3001:3001'
+      - "3001:3001"
     environment:
+      # Fixes
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@ssispro_db:5432/ssispro_db
-      - JWT_SECRET="azertyuiopmlkjhgfdsqqwxcvbn"
       - PORT=3001
-      # Ajoutez ici vos autres variables d'environnement
-      # - NEXTAUTH_SECRET=your-secret-key
-      # - NEXTAUTH_URL=http://localhost:3000
+
+      # Variables sensibles depuis .env
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
     depends_on:
       ssispro_db:
         condition: service_healthy
@@ -43,11 +53,14 @@ services:
       - dokploy-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.flowiseai.rule=Host(`flowise.domain.com`)"
-      - "traefik.http.routers.flowiseai.entrypoints=websecure"
-      - "traefik.http.routers.flowiseai.tls.certResolver=letsencrypt"
-      - "traefik.http.services.flowiseai.loadbalancer.server.port=3000"
+      - "traefik.http.routers.ssispro.rule=Host(`administration.ssispro.com`)"
+      - "traefik.http.routers.ssispro.entrypoints=websecure"
+      - "traefik.http.routers.ssispro.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ssispro.loadbalancer.server.port=3001"
 
+# --------------------------
+# Volumes & Réseau
+# --------------------------
 volumes:
   ssispro_db:
     driver: local
