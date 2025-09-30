@@ -23,12 +23,14 @@ import DeleteConfirmationDialog from "@/components/ui/delete-confirmation-dialog
 import { toast } from "sonner"
 import { Docs } from "@prisma/client"
 import { useDeleteDoc } from "@/hooks/useDeleteDoc"
+import { useAuth } from "@/lib/auth/AuthContext"
 
 export default function Page() {
   const [open, setOpen] = useState(false)
   const [refresh, setRefresh] = useState(0)
   const [formMode, setFormMode] = useState<"new">("new")
   const { deleteDoc, isDeleting } = useDeleteDoc()
+  const { user } = useAuth()
 
   const handleDeleteDoc = async (doc: Docs) => {
     try {
@@ -55,7 +57,7 @@ export default function Page() {
 
     createColumn<Docs>("createdBy.name", "Créé par"),
 
-    createActionsColumn<Docs>([
+    createActionsColumn<Docs>(user?.role !== 'agent' ? [
       {
         label: "Télécharger",
         icon: Download,
@@ -78,7 +80,13 @@ export default function Page() {
           />
         ),
       },
-    ]),
+    ] : [{
+        label: "Télécharger",
+        icon: Download,
+        onClick: (Doc) => {
+          handleDownload(Doc)
+        },
+      }]),
   ]
 
   // Fonction pour charger les données
@@ -146,7 +154,7 @@ export default function Page() {
       <AppHeader parent="Administration" child="Docs" />
       <div className="mt-4 p-5 flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Docs</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        {user?.role !== 'agent' && <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenForm("new")}>
               Ajouter un document
@@ -162,7 +170,7 @@ export default function Page() {
               onSuccess={handleSuccess}
             />
           </DialogContent>
-        </Dialog>
+        </Dialog>}
       </div>
       <div className="mt-4 p-5">
         <FetchingDataTable<Docs, Docs>
