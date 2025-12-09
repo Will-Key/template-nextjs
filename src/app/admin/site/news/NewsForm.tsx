@@ -72,12 +72,22 @@ export default function NewsForm({
   useEffect(() => {
     if (news) {
       form.reset({
-        label: news.label,
-        type: news.type,
-        eventDate: news.eventDate,
-        description: news.description,
-        content: news.content,
-        image: news.image,
+        label: news.label || "", // ✅ Protégé contre undefined
+        type: news.type || "", // ✅ Protégé contre undefined
+        eventDate: news.eventDate ? new Date(news.eventDate) : new Date(), // ✅ Conversion en Date
+        description: news.description || "", // ✅ Protégé contre undefined
+        content: news.content || "", // ✅ Protégé contre undefined
+        image: news.image || undefined, // ✅ Protégé contre null
+      })
+    } else {
+      // ✅ Reset avec valeurs par défaut quand on crée une nouvelle actualité
+      form.reset({
+        label: "",
+        type: "",
+        eventDate: new Date(),
+        description: "",
+        content: "",
+        image: undefined,
       })
     }
   }, [news, form])
@@ -91,7 +101,7 @@ export default function NewsForm({
       const formData = new FormData()
       formData.append("label", values.label)
       formData.append("type", values.type)
-      formData.append("eventDate", values.eventDate.toDateString())
+      formData.append("eventDate", values.eventDate.toISOString()) // ✅ Meilleur format
       formData.append("description", values.description)
       formData.append("content", values.content)
       if (file) formData.append("image", file)
@@ -138,6 +148,7 @@ export default function NewsForm({
                   placeholder="Entrer le titre"
                   disabled={mode === "view"}
                   {...field}
+                  value={field.value || ""} // ✅ Protection supplémentaire
                 />
               </FormControl>
               <FormMessage />
@@ -173,6 +184,7 @@ export default function NewsForm({
                   placeholder="Entrer le type d'actualité"
                   disabled={mode === "view"}
                   {...field}
+                  value={field.value || ""} // ✅ Protection supplémentaire
                 />
               </FormControl>
               <FormMessage />
@@ -190,6 +202,7 @@ export default function NewsForm({
                   placeholder="Entrer la description"
                   disabled={mode === "view"}
                   {...field}
+                  value={field.value || ""} // ✅ Protection supplémentaire
                 />
               </FormControl>
               <FormMessage />
@@ -214,6 +227,7 @@ export default function NewsForm({
                   type="file"
                   accept="image/*"
                   {...field}
+                  value={undefined} // ✅ Les file inputs doivent toujours être uncontrolled
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 />
               </FormControl>

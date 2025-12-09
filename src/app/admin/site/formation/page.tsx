@@ -142,7 +142,7 @@ export default function Page() {
               Créer une formation
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="sm:max-w-[660px] max-h-[660px] overflow-auto">
             <DialogHeader>
               <DialogTitle>
                 {formMode === "edit"
@@ -162,7 +162,7 @@ export default function Page() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="mt-4 p-5">
+      <div className="container mt-4 p-5">
         <FetchingDataTable<Formation, Formation>
           key={refresh}
           columns={columns}

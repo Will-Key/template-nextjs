@@ -128,7 +128,7 @@ const defaultConfig: Required<DataListConfig> = {
   },
   itemHeight: "auto",
   imageConfig: {
-    width: 400,
+    width: 510,
     height: 200,
     className: "rounded mb-2 object-cover max-h-[180px]",
   },

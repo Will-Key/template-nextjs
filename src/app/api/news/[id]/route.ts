@@ -34,7 +34,7 @@ export const GET = withCors(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const PUT = withAuth(async (req: NextRequest, context: any) => {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const contentType = req.headers.get("content-type") || "";

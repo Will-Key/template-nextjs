@@ -154,7 +154,7 @@ export default function Page() {
       <AppHeader parent="Administration" child="Docs" />
       <div className="mt-4 p-5 flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Docs</h1>
-        {user?.role !== 'agent' && <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenForm("new")}>
               Ajouter un document
@@ -170,7 +170,7 @@ export default function Page() {
               onSuccess={handleSuccess}
             />
           </DialogContent>
-        </Dialog>}
+        </Dialog>
       </div>
       <div className="mt-4 p-5">
         <FetchingDataTable<Docs, Docs>
