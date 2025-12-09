@@ -7,10 +7,10 @@ async function main() {
   console.log('🌱 Début du seeding...')
   
   // Nettoyage des données existantes (optionnel)
-  await prisma.formation.deleteMany()
-  await prisma.service.deleteMany()
-  await prisma.news.deleteMany()
-  await prisma.user.deleteMany()
+  // await prisma.formation.deleteMany()
+  // await prisma.service.deleteMany()
+  // await prisma.news.deleteMany()
+  // await prisma.user.deleteMany()
   
   // Création des utilisateurs
   await seedUsers()
@@ -95,7 +95,9 @@ async function seedFormations() {
 
   const existingFormations = await prisma.formation.findMany()
 
-  if (!existingFormations.length) {
+  if (existingFormations.length) {
+    console.log('ℹ️ formations existent déjà')
+  } else {
     for (const formation of formations) {
       await prisma.formation.create({
         data: formation
@@ -103,8 +105,6 @@ async function seedFormations() {
     }
     
     console.log(`✅ ${formations.length} formations créées`)
-  } else {
-    console.log('ℹ️ formations existent déjà')
   }
 }
 
@@ -156,7 +156,9 @@ async function seedServices() {
 
   const existingServices = await prisma.service.findMany()
 
-  if (!existingServices.length) {
+  if (existingServices.length) {
+    console.log('ℹ️ services existent déjà')
+  } else {
     for (const service of services) {
       await prisma.service.create({
         data: service
@@ -164,8 +166,6 @@ async function seedServices() {
     }
     
     console.log(`✅ ${services.length} servies créées`)
-  } else {
-    console.log('ℹ️ services existent déjà')
   }
 }
 
@@ -206,7 +206,9 @@ async function seedNews() {
 
   const existingNews = await prisma.news.findMany()
 
-  if (!existingNews.length) {
+  if (existingNews.length) {
+    console.log('ℹ️ actualité existent déjà')
+  } else {
     for (const _ of news) {
       await prisma.news.create({
         data: _
@@ -214,8 +216,6 @@ async function seedNews() {
     }
     
     console.log(`✅ ${news.length} actualités créées`)
-  } else {
-    console.log('ℹ️ actualité existent déjà')
   }
 }
 
