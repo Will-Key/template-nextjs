@@ -140,8 +140,8 @@ export default function Page() {
               </DialogTitle>
             </DialogHeader>
             <NewsForm
-              news={selectedNews}
-              mode={formMode}
+              news={selectedNews || null}
+              mode={formMode || "new"}
               onClose={() => setOpen(false)}
               onSuccess={handleSuccess}
             />
