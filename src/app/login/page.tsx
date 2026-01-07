@@ -1,33 +1,32 @@
 "use client"
 
 import React, { useEffect } from "react"
-
-import { useAuth } from "../../lib/auth/AuthContext"
+import { useStaffAuth } from "@/lib/staff-auth-context"
 import { useRouter } from "next/navigation"
 import LoginForm from "@/components/auth/LoginForm"
 
 const LoginPage = () => {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, isLoading, staff } = useStaffAuth()
   const router = useRouter()
 
   useEffect(() => {
     // Si l'utilisateur est déjà connecté, le rediriger vers le dashboard
-    if (!loading && isAuthenticated) {
-      router.push("/admin/dashboard")
+    if (!isLoading && isAuthenticated && staff) {
+      router.push(`/dashboard/${staff.restaurant.slug}`)
     }
-  }, [isAuthenticated, loading, router])
+  }, [isAuthenticated, isLoading, staff, router])
 
   // Afficher un loader pendant la vérification
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
       </div>
     )
   }
 
   // Si l'utilisateur est déjà connecté, ne pas afficher le formulaire
-  if (isAuthenticated) {
+  if (isAuthenticated && staff) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

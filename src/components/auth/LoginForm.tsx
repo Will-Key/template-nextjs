@@ -1,19 +1,18 @@
 "use client"
 
 import React, { useState, useCallback } from "react"
-import { useAuth } from "../../lib/auth/AuthContext"
+import { useStaffAuth } from "@/lib/staff-auth-context"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { Lock, Mail } from "lucide-react"
+import { Lock, Mail, UtensilsCrossed } from "lucide-react"
 
 const LoginForm: React.FC = () => {
-  const [personnelNumber, setPersonnelNumber] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const { login } = useAuth()
+  const { login } = useStaffAuth()
   const router = useRouter()
 
   const handleSubmit = useCallback(
@@ -29,19 +28,15 @@ const LoginForm: React.FC = () => {
       setLoading(true)
       setIsSubmitted(true)
 
-      console.log("Début de la soumission du formulaire")
-
       try {
-        const success = await login(personnelNumber, password)
-        console.log("Résultat du login:", success)
+        const result = await login(email, password)
 
-        if (success) {
-          console.log("Login réussi, redirection...")
-          // Ne pas réinitialiser les états ici pour éviter le flash
-          router.push("/admin/dashboard")
+        if (result.success) {
+          // Rediriger vers le dashboard du restaurant
+          router.push("/staff/login") // Le context redirigera vers le bon dashboard
+          router.refresh()
         } else {
-          console.log("Login échoué")
-          setError("Email ou mot de passe incorrect")
+          setError(result.error || "Email ou mot de passe incorrect")
           setLoading(false)
           setIsSubmitted(false)
         }
@@ -60,74 +55,53 @@ const LoginForm: React.FC = () => {
         setLoading(false)
         setIsSubmitted(false)
       }
-      // Ne pas mettre finally ici pour éviter de réinitialiser loading prématurément
     },
-    [personnelNumber, password, login, router, loading, isSubmitted]
-  )
-
-  // Debug pour voir les re-renders
-  console.log(
-    "LoginForm render - loading:",
-    loading,
-    "error:",
-    error,
-    "isSubmitted:",
-    isSubmitted
+    [email, password, login, router, loading, isSubmitted]
   )
 
   return (
     <div className="h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: "url('/images/img07.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
+        className="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600"
       />
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/30" />
       <div className="relative max-w-md w-full space-y-8">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-10 rounded-xl shadow-2xl max-h-screen overflow-auto">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-10 rounded-xl shadow-2xl max-h-screen overflow-auto">
           <div className="space-y-8">
-            <div>
-              <Image
-                src="/images/logoss.png"
-                alt="SSISPRO Logo"
-                width={70}
-                height={70}
-                className="mx-auto h-20 w-auto mb-4"
-              />
+            <div className="flex justify-center">
+              <div className="h-20 w-20 rounded-full bg-orange-100 flex items-center justify-center">
+                <UtensilsCrossed className="h-10 w-10 text-orange-600" />
+              </div>
             </div>
             <div>
               <h1 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                Espace SSISPRO
+                Espace Staff
               </h1>
               <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
-                Gérer le contenu du site et vos Agents.
+                Connectez-vous pour gérer les commandes
               </p>
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="personnelNumber" className="sr-only">
-                    Matricule
+                  <label htmlFor="email" className="sr-only">
+                    Email
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="text-gray-400 dark:text-gray-500 h-5 w-5" />
                     </div>
                     <input
-                      id="personnelNumber"
-                      name="personnelNumber"
-                      type="text"
-                      autoComplete="text"
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
                       required
                       disabled={loading}
-                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
-                      placeholder="Numéro matricule"
-                      value={personnelNumber}
-                      onChange={(e) => setPersonnelNumber(e.target.value)}
+                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
+                      placeholder="Adresse email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                 </div>
@@ -146,7 +120,7 @@ const LoginForm: React.FC = () => {
                       autoComplete="current-password"
                       required
                       disabled={loading}
-                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-ssispro-orange focus:border-ssispro-orange sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
+                      className="appearance-none rounded-lg relative block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm bg-white/80 dark:bg-gray-700/80 disabled:opacity-50"
                       placeholder="Mot de passe"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -168,7 +142,7 @@ const LoginForm: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading || isSubmitted}
-                  className="group relative w-full flex justify-center py-2 sm:py-2.5 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? (
                     <span className="flex items-center">
@@ -200,6 +174,19 @@ const LoginForm: React.FC = () => {
                 </button>
               </div>
             </form>
+
+            {/* Identifiants de test */}
+            <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
+                Identifiants de test :
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-300 text-center">
+                <strong>Email:</strong> caisse@chezmama.ci
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-300 text-center">
+                <strong>Mot de passe:</strong> password123
+              </p>
+            </div>
           </div>
         </div>
       </div>
