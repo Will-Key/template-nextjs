@@ -311,7 +311,7 @@ export default function MenuPage({
                             </div>
                           </div>
                           {item.image && (
-                            <div className="w-24 h-24 relative flex-shrink-0">
+                            <div className="w-24 h-24 relative shrink-0">
                               <Image
                                 src={item.image}
                                 alt={item.name}
@@ -352,7 +352,7 @@ export default function MenuPage({
 
               {selectedItem.allergens.length > 0 && (
                 <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium text-yellow-800">Allergènes</p>
                     <p className="text-sm text-yellow-700">
@@ -409,7 +409,7 @@ export default function MenuPage({
                     className="flex items-center gap-3 p-3 border rounded-lg"
                   >
                     {item.menuItem.image && (
-                      <div className="w-16 h-16 relative rounded overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 relative rounded overflow-hidden shrink-0">
                         <Image
                           src={item.menuItem.image}
                           alt={item.menuItem.name}

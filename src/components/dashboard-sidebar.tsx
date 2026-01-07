@@ -159,7 +159,7 @@ export function DashboardSidebar() {
                       : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                   )}
                 >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  <item.icon className="h-5 w-5 shrink-0" />
                   <span>{item.name}</span>
                 </Link>
               );

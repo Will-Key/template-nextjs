@@ -378,7 +378,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
                           item.status !== "available" ? "opacity-60 bg-muted/50" : ""
                         }`}
                       >
-                        <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                        <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center shrink-0">
                           {item.image ? (
                             <img
                               src={item.image}
@@ -399,7 +399,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
                             </div>
                             <Badge
                               variant={item.status === "available" ? "default" : "secondary"}
-                              className="cursor-pointer flex-shrink-0"
+                              className="cursor-pointer shrink-0"
                               onClick={() => toggleItemStatus(item)}
                             >
                               {item.status === "available" ? "Dispo" : "Indispo"}

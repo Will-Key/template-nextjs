@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
 import { OrderWithDetails } from "@/lib/types/order";
 import { formatPrice, getOrderStatusLabel, getOrderStatusColor } from "@/lib/order-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Clock, CheckCircle2, ChefHat, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Clock, CheckCircle2, ChefHat, Bell, Plus } from "lucide-react";
 import Image from "next/image";
 
 type PageParams = { slug: string; orderId: string };
@@ -16,6 +18,7 @@ export default function OrderStatusPage({
   params: Promise<PageParams>;
 }) {
   const { slug, orderId } = use(params);
+  const router = useRouter();
   const [order, setOrder] = useState<OrderWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -184,7 +187,7 @@ export default function OrderStatusPage({
                 className="flex items-center gap-3 pb-3 border-b last:border-0"
               >
                 {item.menuItem.image && (
-                  <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
+                  <div className="w-12 h-12 relative rounded overflow-hidden shrink-0">
                     <Image
                       src={item.menuItem.image}
                       alt={item.menuItem.name}
@@ -244,6 +247,21 @@ export default function OrderStatusPage({
             </CardContent>
           </Card>
         )}
+
+        {/* Bouton nouvelle commande */}
+        <div className="pt-4 pb-8">
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={() => router.push(`/r/${slug}/table/${order.table.number}`)}
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Passer une nouvelle commande
+          </Button>
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            Vous pouvez commander d'autres articles pour votre table
+          </p>
+        </div>
       </div>
     </div>
   );
