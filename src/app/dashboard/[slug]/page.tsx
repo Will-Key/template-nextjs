@@ -34,7 +34,7 @@ export default function DashboardPage({
 }) {
   const { slug } = use(params);
   const router = useRouter();
-  const { staff, isLoading: authLoading, isAuthenticated } = useStaffAuth();
+  const { staff, isLoading: authLoading, isAuthenticated, authFetch } = useStaffAuth();
   const [orders, setOrders] = useState<OrderWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
@@ -59,21 +59,22 @@ export default function DashboardPage({
     if (!restaurantId) return;
     
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `/api/orders?restaurantId=${restaurantId}&status=pending,confirmed,preparing,ready`
       );
       if (!response.ok) throw new Error("Erreur");
       const data = await response.json();
-      setOrders(data);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
+      setOrders([]);
     }
   };
 
   useEffect(() => {
     async function fetchRestaurant() {
       try {
-        const response = await fetch(`/api/restaurants/${slug}`);
+        const response = await authFetch(`/api/restaurants/${slug}`);
         if (!response.ok) throw new Error("Restaurant non trouvé");
         const data = await response.json();
         setRestaurantId(data.id);
@@ -99,7 +100,7 @@ export default function DashboardPage({
   const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
     setUpdating(orderId);
     try {
-      const response = await fetch(`/api/orders/${orderId}`, {
+      const response = await authFetch(`/api/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

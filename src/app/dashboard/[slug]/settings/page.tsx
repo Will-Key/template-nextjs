@@ -42,7 +42,7 @@ type PageParams = { slug: string };
 export default function SettingsPage({ params }: { params: Promise<PageParams> }) {
   const { slug } = use(params);
   const router = useRouter();
-  const { staff, isLoading: authLoading, isAuthenticated } = useStaffAuth();
+  const { staff, isLoading: authLoading, isAuthenticated, authFetch } = useStaffAuth();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -75,7 +75,7 @@ export default function SettingsPage({ params }: { params: Promise<PageParams> }
   useEffect(() => {
     async function fetchRestaurant() {
       try {
-        const response = await fetch(`/api/restaurants/${slug}`);
+        const response = await authFetch(`/api/restaurants/${slug}`);
         if (!response.ok) throw new Error("Restaurant non trouvé");
         const data = await response.json();
         setRestaurant(data);
@@ -97,7 +97,7 @@ export default function SettingsPage({ params }: { params: Promise<PageParams> }
       }
     }
     fetchRestaurant();
-  }, [slug]);
+  }, [slug, authFetch]);
 
   const saveSettings = async () => {
     if (!form.name.trim()) {
@@ -109,7 +109,7 @@ export default function SettingsPage({ params }: { params: Promise<PageParams> }
 
     setSaving(true);
     try {
-      const response = await fetch(`/api/restaurants/${restaurant.id}`, {
+      const response = await authFetch(`/api/restaurants/${restaurant.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

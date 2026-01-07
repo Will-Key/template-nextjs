@@ -8,6 +8,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 type Staff = {
   id: string;
@@ -28,6 +29,7 @@ type StaffAuthContextType = {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  authFetch: (url: string, options?: RequestInit) => Promise<Response>;
 };
 
 const StaffAuthContext = createContext<StaffAuthContextType | undefined>(undefined);
@@ -35,15 +37,44 @@ const StaffAuthContext = createContext<StaffAuthContextType | undefined>(undefin
 export function StaffAuthProvider({ children }: { children: ReactNode }) {
   const [staff, setStaff] = useState<Staff | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleUnauthorized = useCallback(() => {
+    // Ne pas rediriger si déjà sur la page de login
+    if (pathname === "/login" || pathname === "/staff/login") {
+      return;
+    }
+    
+    setStaff(null);
+    router.push("/login");
+  }, [pathname, router]);
+
+  // Fetch authentifié avec gestion automatique des 401
+  const authFetch = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const response = await fetch(url, {
+      ...options,
+      credentials: "include",
+    });
+
+    if (response.status === 401) {
+      handleUnauthorized();
+    }
+
+    return response;
+  }, [handleUnauthorized]);
 
   const checkAuth = useCallback(async () => {
     try {
-      const response = await fetch("/api/staff/me");
+      const response = await fetch("/api/staff/me", {
+        credentials: "include",
+      });
       if (response.ok) {
         const data = await response.json();
         setStaff(data.staff);
       } else {
         setStaff(null);
+        // Ne pas rediriger automatiquement ici, laisser les pages gérer
       }
     } catch (error) {
       console.error("Erreur de vérification auth:", error);
@@ -97,6 +128,7 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         checkAuth,
+        authFetch,
       }}
     >
       {children}

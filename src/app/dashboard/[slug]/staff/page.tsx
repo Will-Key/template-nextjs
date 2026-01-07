@@ -54,7 +54,7 @@ type PageParams = { slug: string };
 export default function StaffPage({ params }: { params: Promise<PageParams> }) {
   const { slug } = use(params);
   const router = useRouter();
-  const { staff: currentStaff, isLoading: authLoading, isAuthenticated } = useStaffAuth();
+  const { staff: currentStaff, isLoading: authLoading, isAuthenticated, authFetch } = useStaffAuth();
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
@@ -89,7 +89,7 @@ export default function StaffPage({ params }: { params: Promise<PageParams> }) {
   useEffect(() => {
     async function fetchRestaurant() {
       try {
-        const response = await fetch(`/api/restaurants/${slug}`);
+        const response = await authFetch(`/api/restaurants/${slug}`);
         if (!response.ok) throw new Error("Restaurant non trouvé");
         const data = await response.json();
         setRestaurantId(data.id);
@@ -99,17 +99,18 @@ export default function StaffPage({ params }: { params: Promise<PageParams> }) {
       }
     }
     fetchRestaurant();
-  }, [slug]);
+  }, [slug, authFetch]);
 
   const fetchStaff = async () => {
     if (!restaurantId) return;
     try {
-      const response = await fetch(`/api/staff?restaurantId=${restaurantId}`);
+      const response = await authFetch(`/api/staff?restaurantId=${restaurantId}`);
       if (!response.ok) throw new Error("Erreur");
       const data = await response.json();
-      setStaffList(data);
+      setStaffList(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
+      setStaffList([]);
     } finally {
       setLoading(false);
     }
@@ -175,7 +176,7 @@ export default function StaffPage({ params }: { params: Promise<PageParams> }) {
         body.password = form.password;
       }
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -206,7 +207,7 @@ export default function StaffPage({ params }: { params: Promise<PageParams> }) {
     if (!confirm(`Supprimer ${name} du personnel ?`)) return;
 
     try {
-      const response = await fetch(`/api/staff/${id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/staff/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erreur");
       toast.success("Membre supprimé");
       fetchStaff();
@@ -223,7 +224,7 @@ export default function StaffPage({ params }: { params: Promise<PageParams> }) {
     }
 
     try {
-      const response = await fetch(`/api/staff/${staff.id}`, {
+      const response = await authFetch(`/api/staff/${staff.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !staff.isActive }),

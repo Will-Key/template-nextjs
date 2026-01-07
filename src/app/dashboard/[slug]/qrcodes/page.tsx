@@ -39,7 +39,7 @@ export default function QRCodesPage({ params }: { params: Promise<PageParams> })
   const { slug } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { staff, isLoading: authLoading, isAuthenticated } = useStaffAuth();
+  const { staff, isLoading: authLoading, isAuthenticated, authFetch } = useStaffAuth();
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export default function QRCodesPage({ params }: { params: Promise<PageParams> })
   useEffect(() => {
     async function fetchRestaurant() {
       try {
-        const response = await fetch(`/api/restaurants/${slug}`);
+        const response = await authFetch(`/api/restaurants/${slug}`);
         if (!response.ok) throw new Error("Restaurant non trouvé");
         const data = await response.json();
         setRestaurantId(data.id);
@@ -70,17 +70,18 @@ export default function QRCodesPage({ params }: { params: Promise<PageParams> })
       }
     }
     fetchRestaurant();
-  }, [slug]);
+  }, [slug, authFetch]);
 
   const fetchTables = async () => {
     if (!restaurantId) return;
     try {
-      const response = await fetch(`/api/tables?restaurantId=${restaurantId}`);
+      const response = await authFetch(`/api/tables?restaurantId=${restaurantId}`);
       if (!response.ok) throw new Error("Erreur");
       const data = await response.json();
-      setTables(data.sort((a: Table, b: Table) => a.number - b.number));
+      setTables(Array.isArray(data) ? data.sort((a: Table, b: Table) => a.number - b.number) : []);
     } catch (error) {
       console.error(error);
+      setTables([]);
     } finally {
       setLoading(false);
     }

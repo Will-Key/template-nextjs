@@ -47,7 +47,7 @@ type PageParams = { slug: string };
 export default function TablesPage({ params }: { params: Promise<PageParams> }) {
   const { slug } = use(params);
   const router = useRouter();
-  const { staff, isLoading: authLoading, isAuthenticated } = useStaffAuth();
+  const { staff, isLoading: authLoading, isAuthenticated, authFetch } = useStaffAuth();
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export default function TablesPage({ params }: { params: Promise<PageParams> }) 
   useEffect(() => {
     async function fetchRestaurant() {
       try {
-        const response = await fetch(`/api/restaurants/${slug}`);
+        const response = await authFetch(`/api/restaurants/${slug}`);
         if (!response.ok) throw new Error("Restaurant non trouvé");
         const data = await response.json();
         setRestaurantId(data.id);
@@ -77,17 +77,18 @@ export default function TablesPage({ params }: { params: Promise<PageParams> }) 
       }
     }
     fetchRestaurant();
-  }, [slug]);
+  }, [slug, authFetch]);
 
   const fetchTables = async () => {
     if (!restaurantId) return;
     try {
-      const response = await fetch(`/api/tables?restaurantId=${restaurantId}`);
+      const response = await authFetch(`/api/tables?restaurantId=${restaurantId}`);
       if (!response.ok) throw new Error("Erreur");
       const data = await response.json();
-      setTables(data.sort((a: Table, b: Table) => a.number - b.number));
+      setTables(Array.isArray(data) ? data.sort((a: Table, b: Table) => a.number - b.number) : []);
     } catch (error) {
       console.error(error);
+      setTables([]);
     } finally {
       setLoading(false);
     }
@@ -126,7 +127,7 @@ export default function TablesPage({ params }: { params: Promise<PageParams> }) 
       const url = editingTable ? `/api/tables/${editingTable.id}` : "/api/tables";
       const method = editingTable ? "PUT" : "POST";
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -157,7 +158,7 @@ export default function TablesPage({ params }: { params: Promise<PageParams> }) 
     if (!confirm("Supprimer cette table ?")) return;
 
     try {
-      const response = await fetch(`/api/tables/${id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/tables/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erreur");
       toast.success("Table supprimée");
       fetchTables();
@@ -169,7 +170,7 @@ export default function TablesPage({ params }: { params: Promise<PageParams> }) 
 
   const updateStatus = async (table: Table, newStatus: string) => {
     try {
-      const response = await fetch(`/api/tables/${table.id}`, {
+      const response = await authFetch(`/api/tables/${table.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

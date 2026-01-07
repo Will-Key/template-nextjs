@@ -41,7 +41,7 @@ type MenuCategory = {
   name: string;
   description: string | null;
   sortOrder: number;
-  items: MenuItem[];
+  menuItems: MenuItem[];
 };
 
 type MenuItem = {
@@ -59,7 +59,7 @@ type PageParams = { slug: string };
 export default function MenuPage({ params }: { params: Promise<PageParams> }) {
   const { slug } = use(params);
   const router = useRouter();
-  const { staff, isLoading: authLoading, isAuthenticated } = useStaffAuth();
+  const { staff, isLoading: authLoading, isAuthenticated, authFetch } = useStaffAuth();
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
@@ -91,7 +91,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
   useEffect(() => {
     async function fetchRestaurant() {
       try {
-        const response = await fetch(`/api/restaurants/${slug}`);
+        const response = await authFetch(`/api/restaurants/${slug}`);
         if (!response.ok) throw new Error("Restaurant non trouvé");
         const data = await response.json();
         setRestaurantId(data.id);
@@ -101,17 +101,18 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
       }
     }
     fetchRestaurant();
-  }, [slug]);
+  }, [slug, authFetch]);
 
   const fetchCategories = async () => {
     if (!restaurantId) return;
     try {
-      const response = await fetch(`/api/menu/categories?restaurantId=${restaurantId}`);
+      const response = await authFetch(`/api/menu/categories?restaurantId=${restaurantId}`);
       if (!response.ok) throw new Error("Erreur");
       const data = await response.json();
-      setCategories(data);
+      setCategories(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -148,7 +149,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
         : "/api/menu/categories";
       const method = editingCategory ? "PUT" : "POST";
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -175,7 +176,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
     if (!confirm("Supprimer cette catégorie et tous ses plats ?")) return;
 
     try {
-      const response = await fetch(`/api/menu/categories/${id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/menu/categories/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erreur");
       toast.success("Catégorie supprimée");
       fetchCategories();
@@ -222,7 +223,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
         : "/api/menu/items";
       const method = editingItem ? "PUT" : "POST";
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -248,7 +249,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
     if (!confirm("Supprimer ce plat ?")) return;
 
     try {
-      const response = await fetch(`/api/menu/items/${id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/menu/items/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erreur");
       toast.success("Plat supprimé");
       fetchCategories();
@@ -261,7 +262,7 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
   const toggleItemStatus = async (item: MenuItem) => {
     const newStatus = item.status === "available" ? "unavailable" : "available";
     try {
-      const response = await fetch(`/api/menu/items/${item.id}`, {
+      const response = await authFetch(`/api/menu/items/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -364,13 +365,13 @@ export default function MenuPage({ params }: { params: Promise<PageParams> }) {
                 )}
               </CardHeader>
               <CardContent>
-                {category.items.length === 0 ? (
+                {category.menuItems.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
                     Aucun plat dans cette catégorie
                   </p>
                 ) : (
                   <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                    {category.items.map((item) => (
+                    {category.menuItems.map((item) => (
                       <div
                         key={item.id}
                         className={`flex items-start gap-3 p-3 rounded-lg border ${
