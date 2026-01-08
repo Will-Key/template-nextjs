@@ -2,17 +2,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma';
 
-const prisma = new PrismaClient()
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function POST(request: NextRequest) {
   try {
-    const { personnelNumber, password } = await request.json();
+    const { email, password } = await request.json();
 
     // Validation des champs
-    if (!personnelNumber || !password) {
+    if (!email || !password) {
       return NextResponse.json(
         { error: 'Email et mot de passe requis' },
         { status: 400 }
@@ -20,10 +19,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Rechercher l'utilisateur
-    const user = await prisma.user.findUnique({ where: { personnelNumber } })
+    const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },
+        { status: 401 }
+      );
+    }
+
+    // Vérifier si l'utilisateur est actif
+    if (!user.isActive) {
+      return NextResponse.json(
+        { error: 'Compte désactivé' },
         { status: 401 }
       );
     }
@@ -42,7 +49,7 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign(
       { 
         userId: user.id,
-        personnelNumber: user.personnelNumber,
+        email: user.email,
         role: user.role
       },
       JWT_SECRET,
@@ -59,16 +66,15 @@ export async function POST(request: NextRequest) {
       user: userWithoutPassword
     });
 
-    console.log('token', token)
     // Définir le cookie avec le token
     response.cookies.set('auth-token', token, {
-      httpOnly: true,    // Sécurisé contre XSS
-      secure: false, //process.env.NODE_ENV === 'production', // HTTPS en production
-      sameSite: 'strict', // Protection CSRF
-      maxAge: 60 * 60 * 24, // 1 jour en secondes
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24, // 1 jour
       path: '/'
     });
-    console.log('response', response)
+
     return response;
 
   } catch (error) {

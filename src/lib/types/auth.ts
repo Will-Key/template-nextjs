@@ -1,12 +1,10 @@
-import { Role } from "@prisma/client"
-
 export interface AuthError extends Error {
   status?: number
 }
 
 export interface JWTPayload {
   userId: string
-  personnelNumber: string
+  email: string
   role?: string
   exp: number
   iat: number
@@ -14,7 +12,7 @@ export interface JWTPayload {
 
 export interface AuthUser {
   userId: string
-  personnelNumber: string
-  role: Role
+  email: string
+  role: string
   name?: string
 }

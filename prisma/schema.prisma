@@ -14,327 +14,49 @@ datasource db {
 // ENUMS
 // ============================================
 
-enum StaffRole {
-  owner // Propriétaire du restaurant
-  manager // Gérant
-  cashier // Caissier
-  waiter // Serveur
-  kitchen // Personnel de cuisine
-}
-
-enum OrderStatus {
-  pending // En attente de confirmation
-  confirmed // Confirmée par le caissier
-  preparing // En préparation en cuisine
-  ready // Prête à être servie/récupérée
-  served // Servie au client
-  completed // Terminée (payée)
-  cancelled // Annulée
-}
-
-enum PaymentStatus {
-  pending // En attente
-  paid // Payée
-  refunded // Remboursée
-}
-
-enum PaymentMethod {
-  cash // Espèces
-  card // Carte bancaire
-  mobile // Mobile money
-  other // Autre
-}
-
-enum TableStatus {
-  available // Disponible
-  occupied // Occupée
-  reserved // Réservée
-}
-
-enum MenuItemStatus {
-  available // Disponible
-  unavailable // Indisponible (rupture de stock)
-  hidden // Caché du menu
-}
-
-enum NotificationType {
-  new_order // Nouvelle commande
-  order_confirmed // Commande confirmée
-  order_ready // Commande prête
-  order_served // Commande servie
-  order_cancelled // Commande annulée
+enum UserRole {
+  admin
+  user
 }
 
 // ============================================
 // MODÈLES
 // ============================================
 
-// Restaurant - L'établissement
-model Restaurant {
-  id                 String   @id @default(uuid())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  name               String
-  slug               String   @unique // URL-friendly identifier (ex: "chez-mama")
-  description        String?
-  address            String?
-  phone              String?
-  email              String?
-  logo               String?
-  logoPublicId       String?
-  coverImage         String?
-  coverImagePublicId String?
-  isActive           Boolean  @default(true)
-
-  // Configuration
-  currency String @default("XOF") // Devise (FCFA)
-  taxRate  Float  @default(0) // Taux de taxe (%)
-
-  // Relations
-  categories MenuCategory[]
-  menuItems  MenuItem[]
-  tables     Table[]
-  staff      Staff[]
-  orders     Order[]
-
-  @@index([slug])
-}
-
-// Personnel du restaurant
-model Staff {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  name      String
-  phone     String?
-  email     String?   @unique
-  password  String
-  role      StaffRole @default(waiter)
-  isActive  Boolean   @default(true)
-
-  // Restaurant auquel appartient ce staff
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId String
-
-  // Tables assignées (pour les serveurs)
-  assignedTables Table[]
-
-  // Commandes traitées
-  ordersHandled Order[] @relation("OrderHandler")
-
-  // Notifications reçues
-  notifications Notification[]
-
-  @@index([restaurantId])
-  @@index([email])
-}
-
-// Table du restaurant
-model Table {
-  id        String      @id @default(uuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  number    Int // Numéro de table
-  name      String? // Nom optionnel (ex: "Terrasse 1")
-  capacity  Int         @default(4) // Nombre de places
-  status    TableStatus @default(available)
-  qrCode    String? // URL ou données du QR code
-
-  // Restaurant
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId String
-
-  // Serveur assigné (optionnel)
-  assignedWaiter   Staff?  @relation(fields: [assignedWaiterId], references: [id])
-  assignedWaiterId String?
-
-  // Commandes de cette table
-  orders Order[]
-
-  @@unique([restaurantId, number]) // Numéro unique par restaurant
-  @@index([restaurantId])
-}
-
-// Catégorie de menu (Entrées, Plats, Desserts, Boissons...)
-model MenuCategory {
-  id            String   @id @default(uuid())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  name          String
-  description   String?
-  image         String?
-  imagePublicId String?
-  displayOrder  Int      @default(0) // Ordre d'affichage
-  isActive      Boolean  @default(true)
-
-  // Restaurant
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId String
-
-  // Plats dans cette catégorie
-  menuItems MenuItem[]
-
-  @@index([restaurantId])
-}
-
-// Plat/Article du menu
-model MenuItem {
-  id            String         @id @default(uuid())
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  name          String
-  description   String?
-  price         Float // Prix en devise du restaurant
-  image         String?
-  imagePublicId String?
-  status        MenuItemStatus @default(available)
-  displayOrder  Int            @default(0)
-
-  // Temps de préparation estimé (en minutes)
-  prepTime Int?
-
-  // Informations nutritionnelles/allergènes (optionnel)
-  ingredients  String[]
-  allergens    String[]
-  isVegetarian Boolean  @default(false)
-  isVegan      Boolean  @default(false)
-  isSpicy      Boolean  @default(false)
-
-  // Restaurant et catégorie
-  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId String
-  category     MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId   String
-
-  // Lignes de commande contenant cet article
-  orderItems OrderItem[]
-
-  @@index([restaurantId])
-  @@index([categoryId])
-}
-
-// Client (optionnel - peut commander sans compte)
-model Customer {
+// User - Utilisateur de l'application
+model User {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  name      String?
-  phone     String?  @unique
-  email     String?  @unique
 
-  // Pour les notifications push
-  pushToken String?
+  email    String   @unique
+  password String
+  name     String
+  role     UserRole @default(user)
+  isActive Boolean  @default(true)
 
-  // Historique des commandes
-  orders Order[]
+  // Ajouter vos relations ici
+  // posts Post[]
 
-  @@index([phone])
+  @@index([email])
 }
 
-// Commande
-model Order {
-  id          String      @id @default(uuid())
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderNumber String // Numéro de commande lisible (ex: "CMD-001")
-  status      OrderStatus @default(pending)
+// ============================================
+// Ajoutez vos modèles ici
+// ============================================
 
-  // Montants
-  subtotal  Float // Sous-total avant taxes
-  taxAmount Float @default(0) // Montant des taxes
-  total     Float // Total à payer
-
-  // Paiement
-  paymentStatus PaymentStatus  @default(pending)
-  paymentMethod PaymentMethod?
-  paidAt        DateTime?
-
-  // Notes/instructions spéciales
-  notes String?
-
-  // Estimation du temps de préparation (en minutes)
-  estimatedPrepTime Int?
-
-  // Timestamps des changements de statut
-  confirmedAt DateTime?
-  preparingAt DateTime?
-  readyAt     DateTime?
-  servedAt    DateTime?
-  completedAt DateTime?
-  cancelledAt DateTime?
-
-  // Relations
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId String
-
-  table   Table  @relation(fields: [tableId], references: [id])
-  tableId String
-
-  // Client (optionnel)
-  customer   Customer? @relation(fields: [customerId], references: [id])
-  customerId String?
-
-  // Staff qui a traité la commande
-  handledBy   Staff?  @relation("OrderHandler", fields: [handledById], references: [id])
-  handledById String?
-
-  // Articles commandés
-  items OrderItem[]
-
-  // Notifications liées
-  notifications Notification[]
-
-  @@index([restaurantId])
-  @@index([tableId])
-  @@index([customerId])
-  @@index([orderNumber])
-  @@index([status])
-}
-
-// Ligne de commande (article dans une commande)
-model OrderItem {
-  id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  quantity   Int      @default(1)
-  unitPrice  Float // Prix unitaire au moment de la commande
-  totalPrice Float // Prix total (quantity * unitPrice)
-
-  // Notes spéciales pour cet article (ex: "sans oignons")
-  notes String?
-
-  // Relations
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String
-
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  menuItemId String
-
-  @@index([orderId])
-  @@index([menuItemId])
-}
-
-// Notification
-model Notification {
-  id        String           @id @default(uuid())
-  createdAt DateTime         @default(now())
-  type      NotificationType
-  title     String
-  message   String
-  isRead    Boolean          @default(false)
-  readAt    DateTime?
-
-  // Destinataire (Staff ou Customer via pushToken)
-  staff   Staff?  @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  staffId String?
-
-  // Commande concernée
-  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String?
-
-  // Pour les notifications push client
-  customerPushToken String?
-
-  @@index([staffId])
-  @@index([orderId])
-}
+// Exemple de modèle Post
+// model Post {
+//   id        String   @id @default(uuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   title     String
+//   content   String?
+//   published Boolean  @default(false)
+//
+//   authorId  String
+//   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+//
+//   @@index([authorId])
+// }

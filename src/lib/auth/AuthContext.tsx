@@ -3,11 +3,21 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { User } from "@prisma/client"
+
+// Type User simplifié pour le template
+interface User {
+  id: string
+  email: string
+  name: string
+  role: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
 
 interface AuthContextType {
   user: User | null
-  login: (personnelNumber: string, password: string) => Promise<boolean>
+  login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   loading: boolean
   isAuthenticated: boolean
@@ -32,26 +42,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const router = useRouter()
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est connecté au chargement
     checkAuthStatus()
   }, [])
 
   const checkAuthStatus = async () => {
     try {
       setLoading(true)
-
-      // Utiliser une route protégée pour vérifier l'authentification
-      // Le cookie sera automatiquement envoyé avec la requête
       const response = await fetch("/api/auth/me", {
         method: "GET",
-        credentials: "include", // Important pour envoyer les cookies
+        credentials: "include",
       })
 
       if (response.ok) {
         const userData = await response.json()
         setUser(userData.user)
       } else {
-        // Token invalide ou expiré
         setUser(null)
       }
     } catch (error) {
@@ -62,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  const login = async (personnelNumber: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true)
 
@@ -71,8 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ personnelNumber, password }),
-        credentials: "include", // Important pour recevoir les cookies
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
       })
 
       if (response.ok) {
@@ -94,7 +99,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async (): Promise<void> => {
     try {
-      // Appeler l'API de logout pour supprimer le cookie côté serveur
       await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
@@ -102,7 +106,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error)
     } finally {
-      // Même en cas d'erreur, nettoyer l'état local
       setUser(null)
       router.push("/login")
     }
@@ -119,3 +122,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
+

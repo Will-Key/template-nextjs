@@ -143,7 +143,7 @@ export function withAuthAndRole<T = any>(
         
         const allowedRoles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
         
-        if (!allowedRoles.includes(user.role) && user.role !== 'admin' && user.role !== "super_admin") {
+        if (!allowedRoles.includes(user.role) && user.role !== 'admin') {
           const forbiddenResponse = NextResponse.json(
             { error: 'Accès non autorisé pour ce rôle' },
             { status: 403 }
@@ -183,7 +183,7 @@ export function withAuthAndRoleSimple(
         
         const allowedRoles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
         
-        if (!allowedRoles.includes(user.role) && user.role !== "admin" && user.role !== "super_admin") {
+        if (!allowedRoles.includes(user.role) && user.role !== 'admin') {
           const forbiddenResponse = NextResponse.json(
             { error: 'Accès non autorisé pour ce rôle' },
             { status: 403 }

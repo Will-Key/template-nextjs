@@ -1,10 +1,9 @@
 // components/auth/ProtectedRoute.tsx
 "use client"
 
-import React from "react"
-import { useAuth } from "../../lib/auth/AuthContext"
+import React, { useEffect } from "react"
+import { useAuth } from "@/lib/auth/AuthContext"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -53,21 +52,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   // Si l'authentification est requise mais l'utilisateur n'est pas connecté
   if (requireAuth && !isAuthenticated) {
-    return null // Le redirect se fait dans useEffect
+    return null
   }
 
   // Vérifier les rôles
   if (requireAuth && isAuthenticated && allowedRoles.length > 0) {
     const userRole = user?.role
     if (!userRole || !allowedRoles.includes(userRole)) {
-      return null // Le redirect se fait dans useEffect
+      return null
     }
   }
 

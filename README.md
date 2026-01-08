@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Template
 
-## Getting Started
+Un template moderne pour démarrer rapidement vos projets Next.js avec les meilleures pratiques.
 
-First, run the development server:
+## 🚀 Technologies
+
+- **Next.js 15** - App Router, Server Components, Turbopack
+- **Prisma ORM** - PostgreSQL, migrations automatiques, requêtes type-safe
+- **Shadcn/UI** - Composants accessibles et personnalisables
+- **Tailwind CSS v4** - Styling moderne avec variables CSS
+- **TypeScript** - Type-safety complète
+- **Authentification JWT** - Cookies HTTP-only sécurisés
+- **next-themes** - Support du mode sombre
+
+## 📦 Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Cloner le template
+git clone <your-repo-url> my-project
+cd my-project
+
+# Installer les dépendances
+pnpm install
+
+# Copier le fichier d'environnement
+cp .env.example .env
+
+# Configurer la base de données PostgreSQL dans .env
+# DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
+
+# Générer le client Prisma
+pnpm db:generate
+
+# Créer les tables
+pnpm db:migrate
+
+# (Optionnel) Remplir avec des données de test
+pnpm db:seed
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏃 Démarrage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Mode développement
+pnpm dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Build production
+pnpm build
 
-## Learn More
+# Démarrer en production
+pnpm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Structure du projet
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+├── prisma/
+│   ├── schema.prisma    # Schéma de base de données
+│   └── seed.ts          # Données de test
+├── src/
+│   ├── app/
+│   │   ├── api/         # Routes API
+│   │   │   ├── auth/    # Authentification (login, logout, me)
+│   │   │   └── users/   # CRUD utilisateurs
+│   │   ├── dashboard/   # Pages dashboard
+│   │   ├── login/       # Page de connexion
+│   │   └── page.tsx     # Page d'accueil
+│   ├── components/
+│   │   ├── ui/          # Composants Shadcn/UI
+│   │   └── ...          # Composants personnalisés
+│   ├── lib/
+│   │   ├── auth/        # Contexte et utilitaires auth
+│   │   ├── prisma.ts    # Client Prisma
+│   │   └── utils.ts     # Utilitaires
+│   └── hooks/           # Hooks personnalisés
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔐 Authentification
 
-## Deploy on Vercel
+Le template inclut un système d'authentification complet :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Login** : `POST /api/auth/login`
+- **Logout** : `POST /api/auth/logout`
+- **Current User** : `GET /api/auth/me`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Comptes de test
+
+| Email              | Mot de passe | Rôle  |
+| ------------------ | ------------ | ----- |
+| admin@example.com  | admin123     | admin |
+| user@example.com   | user123      | user  |
+
+## 📝 Scripts
+
+```bash
+pnpm dev          # Démarrer en développement
+pnpm build        # Build production
+pnpm start        # Démarrer en production
+pnpm lint         # Linter ESLint
+pnpm db:generate  # Générer le client Prisma
+pnpm db:migrate   # Créer une migration
+pnpm db:push      # Push schema sans migration
+pnpm db:seed      # Remplir la BDD avec des données de test
+pnpm db:reset     # Reset complet de la BDD
+pnpm db:studio    # Ouvrir Prisma Studio
+```
+
+## 🎨 Personnalisation
+
+### Thème
+
+Modifiez les couleurs dans `src/app/globals.css` :
+
+```css
+:root {
+  --primary: oklch(0.67 0.18 45);
+  /* ... autres variables */
+}
+```
+
+### Schéma de base de données
+
+Ajoutez vos modèles dans `prisma/schema.prisma` puis :
+
+```bash
+pnpm db:migrate
+```
+
+### Ajouter des composants Shadcn/UI
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+## 📄 License
+
+MIT

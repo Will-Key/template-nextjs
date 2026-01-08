@@ -3,13 +3,13 @@
 import * as React from "react"
 import {
   Settings,
-  SquareTerminal,
+  Users,
   ChevronRight,
   LayoutDashboard,
+  Home,
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -34,95 +34,54 @@ import {
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth/AuthContext"
 
-// This is sample data.
+// Configuration de la navigation - À personnaliser selon vos besoins
 const data = {
-  user: {
-    name: "ssispro",
-    personnelNumber: "m@example.com",
-    avatar: "/images/logoss.png",
-  },
-  teams: [
-    {
-      name: "SSISPRO",
-      logo: "/images/logoss.png",
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
-      title: "Dashboard",
-      url: "/admin/dashboard",
-      icon: LayoutDashboard,
-      requiredProfile: "ADMIN;AGENT;super_admin",
+      title: "Accueil",
+      url: "/",
+      icon: Home,
     },
     {
-      title: "Administration",
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Utilisateurs",
+      url: "/dashboard/users",
+      icon: Users,
+      requiredRole: "admin",
+    },
+    {
+      title: "Paramètres",
       url: "#",
       icon: Settings,
-      requiredProfile: "ADMIN;AGENT;super_admin",
       items: [
         {
-          title: "Agent",
-          url: "/admin/agent",
-          requiredProfile: "ADMIN;super_admin",
+          title: "Profil",
+          url: "/dashboard/settings/profile",
         },
         {
-          title: "Documents",
-          url: "/admin/docs",
-          requiredProfile: "ADMIN;AGENT;super_admin",
-        },
-      ],
-    },
-    {
-      title: "Site",
-      url: "#",
-      icon: SquareTerminal,
-      requiredProfile: "admin;super_admin",
-      items: [
-        {
-          title: "Actualité",
-          url: "/admin/site/news",
-          requiredProfile: "admin;super_admin",
-        },
-        {
-          title: "Formation",
-          url: "/admin/site/formation",
-          requiredProfile: "admin;super_admin",
-        },
-        {
-          title: "Service",
-          url: "/admin/site/service",
-          requiredProfile: "admin;super_admin",
+          title: "Préférences",
+          url: "/dashboard/settings/preferences",
         },
       ],
     },
   ],
 }
 
-// Fonction utilitaire pour vérifier les permissions
-function hasPermission(
-  userProfile: string | undefined,
-  requiredProfile: string
-): boolean {
-  const userProfiles = userProfile?.toLowerCase()?.split(";")
-  const requiredProfiles = requiredProfile?.toLowerCase().split(";")
-  return requiredProfiles.some((profile) =>
-    userProfiles?.includes(profile?.toLowerCase())
-  )
+// Fonction utilitaire pour vérifier les permissions par rôle
+function hasRole(userRole: string | undefined, requiredRole?: string): boolean {
+  if (!requiredRole) return true
+  if (!userRole) return false
+  
+  // L'admin a accès à tout
+  if (userRole === 'admin') return true
+  
+  const requiredRoles = requiredRole.toLowerCase().split(";")
+  return requiredRoles.includes(userRole.toLowerCase())
 }
-
-// Hook personnalisé pour vérifier si une URL est active
-// function useIsActive(url: string, exact: boolean = false): boolean {
-//   const pathname = usePathname()
-
-//   if (!url || url === "#") return false
-
-//   if (exact) {
-//     return pathname === url
-//   }
-
-//   return pathname.startsWith(url)
-// }
 
 // Composant pour un item de navigation simple
 function SimpleNavItem({
@@ -162,7 +121,6 @@ function CollapsibleNavItem({
   const shouldBeOpen = isMainItemActive || hasActiveSubItem
   const pathname = usePathname()
 
-  // ✅ Fonction utilitaire pour vérifier l'état actif
   const isUrlActive = React.useCallback(
     (url: string, exact: boolean = false): boolean => {
       if (!url || url === "#") return false
@@ -174,7 +132,6 @@ function CollapsibleNavItem({
     [pathname]
   )
 
-  // ✅ Calculer les états actifs avec la fonction utilitaire
   const subItemsActiveStates = React.useMemo(
     () =>
       allowedSubItems.map((subItem) => ({
@@ -222,26 +179,22 @@ function CollapsibleNavItem({
   )
 }
 
-// Composant NavMain optimisé avec hooks appelés correctement
+// Composant NavMain
 function NavMain({
   items,
-  userProfile,
+  userRole,
 }: {
   items: typeof data.navMain
-  userProfile: string | undefined
+  userRole: string | undefined
 }) {
-  // ✅ Hook appelé une seule fois au début du composant
   const pathname = usePathname()
 
-  // ✅ Fonction utilitaire qui n'utilise pas de hooks
   const isUrlActive = React.useCallback(
     (url: string, exact: boolean = false): boolean => {
       if (!url || url === "#") return false
-
       if (exact) {
         return pathname === url
       }
-
       return pathname.startsWith(url)
     },
     [pathname]
@@ -253,32 +206,26 @@ function NavMain({
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            // Vérifier si l'utilisateur a les permissions pour voir cet item
-            if (!hasPermission(userProfile, item.requiredProfile)) {
+            // Vérifier si l'utilisateur a le rôle requis
+            if (!hasRole(userRole, item.requiredRole)) {
               return null
             }
 
             // Filtrer les sous-items selon les permissions
             const allowedSubItems =
               item.items?.filter((subItem) =>
-                hasPermission(userProfile, subItem.requiredProfile)
+                hasRole(userRole, subItem.requiredRole)
               ) || []
 
-            // Détecter si c'est un item avec sous-menus
             const hasSubItems = allowedSubItems.length > 0
-
-            // ✅ Utiliser la fonction utilitaire au lieu du hook
             const isMainItemActive = isUrlActive(
               item.url !== "#" ? item.url : "",
               false
             )
-
-            // Pour les items avec sous-menus, vérifier si un sous-item est actif
             const hasActiveSubItem =
               hasSubItems &&
               allowedSubItems.some((subItem) => isUrlActive(subItem.url, false))
 
-            // Si c'est un item simple (comme Dashboard)
             if (!hasSubItems) {
               return (
                 <SimpleNavItem
@@ -289,7 +236,6 @@ function NavMain({
               )
             }
 
-            // Pour les items avec sous-menus
             return (
               <CollapsibleNavItem
                 key={item.title}
@@ -308,13 +254,16 @@ function NavMain({
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, logout } = useAuth()
+  
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <div className="flex items-center gap-2 px-4 py-2">
+          <span className="font-semibold text-lg">My App</span>
+        </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} userProfile={user?.role} />
+        <NavMain items={data.navMain} userRole={user?.role} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} onClick={logout} />

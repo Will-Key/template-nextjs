@@ -1,19 +1,6 @@
-import { Docs, News, User } from "@prisma/client"
-
-// Définir les types pour notre API
-export type Formation = {
-  id: string
-  label: string
-  description: string
-  days: number
-  maxParticipants: number
-  amount: number
-  modules: string[]
-  status: "published" | "draft" | "archived"
-  createdAt: string
-}
-
 // Classe de base pour les services API
+// Utilisez cette classe pour créer des services API réutilisables
+
 export abstract class BaseApiService<T> {
   protected baseUrl: string
 
@@ -109,73 +96,18 @@ export abstract class BaseApiService<T> {
   }
 }
 
-// Service pour les formations
-export class FormationsService extends BaseApiService<Formation> {
-  constructor() {
-    super('formations')
-  }
-  
-  // Méthodes spécifiques aux formations
-  async getByStatus(status: Formation['status']): Promise<Formation[]> {
-    try {
-      const response = await fetch(`${this.baseUrl}/status/${status}`)
-      
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`)
-      }
-      
-      return await response.json()
-    } catch (error) {
-      console.error(`Erreur lors de la récupération des formations par statut ${status}:`, error)
-      throw error
-    }
-  }
-}
-
-// Service pour les utilisateurs
-export class UsersService extends BaseApiService<User> {
-  constructor() {
-    super('agents')
-  }
-  
-  // Méthodes spécifiques aux utilisateurs
-  async getByRole(role: User['role']): Promise<User[]> {
-    try {
-      const response = await fetch(`${this.baseUrl}/role/${role}`)
-      
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`)
-      }
-      
-      return await response.json()
-    } catch (error) {
-      console.error(`Erreur lors de la récupération des utilisateurs par rôle ${role}:`, error)
-      throw error
-    }
-  }
-}
-
-export class DocsService extends BaseApiService<Docs> {
-  constructor() {
-    super('docs')
-  }
-}
-
-export class NewsService extends BaseApiService<News> {
-  constructor() {
-    super('news')
-  }
-}
-
-export class ServicesService extends BaseApiService<News> {
-  constructor() {
-    super('services')
-  }
-}
-
-// Export des instances des services
-export const formationsService = new FormationsService()
-export const usersService = new UsersService()
-export const newsServices = new NewsService()
-export const docsService = new DocsService()
-export const servicesServices = new ServicesService()
+// Exemple d'utilisation:
+// 
+// interface Post {
+//   id: string
+//   title: string
+//   content: string
+// }
+// 
+// class PostsService extends BaseApiService<Post> {
+//   constructor() {
+//     super('posts')
+//   }
+// }
+// 
+// export const postsService = new PostsService()

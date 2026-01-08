@@ -1,10 +1,8 @@
 // app/api/auth/me/route.ts
 import { NextResponse } from 'next/server'
 import { withAuthSimple } from '@/lib/middleware'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma'
 import { AuthUser } from '@/lib/types/auth'
-
-const prisma = new PrismaClient()
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getMeHandler(_: any, user: AuthUser) {
@@ -14,9 +12,12 @@ async function getMeHandler(_: any, user: AuthUser) {
       where: { id: user.userId },
       select: {
         id: true,
-        personnelNumber: true,
+        email: true,
         name: true,
         role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
         // Exclure le password
       }
     })

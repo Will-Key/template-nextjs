@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "SSISPRO",
-  description: "Sécurité Incendie & Formation Professionnelle",
+  title: "My App",
+  description: "Template Next.js avec Prisma et Shadcn/UI",
 }
 
 export default function RootLayout({
