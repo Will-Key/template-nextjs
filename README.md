@@ -135,3 +135,13 @@ npx shadcn@latest add <component-name>
 ## 📄 License
 
 MIT
+
+## Pour démarrer le projet 
+```bash
+npm install
+cp .env.example .env
+# Configurer DATABASE_URL dans .env
+npm run db:migrate
+npm run db:seed
+npm run dev
+```
